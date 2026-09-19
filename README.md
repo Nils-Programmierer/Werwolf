@@ -3,7 +3,7 @@ Werwolf - Spiele deine Rolle. Täusche alle.
 
 
 
-<a href="public/img/icon512_rounded.png"><img src="public/img/icon512_rounded.png" alt="Werwolf Logo" width="200" /></a>
+<a href="img/icon512_rounded.png"><img src="img/icon512_rounded.png" alt="Werwolf Logo" width="200" /></a>
 
 ## Beschreibung
 Werwolf ist ein spannendes Partyspiel voller Täuschung, Diskussionen und überraschender Wendungen. Schlüpfe in deine Rolle, finde heraus, wem du vertrauen kannst, und entlarve die Werwölfe, bevor es zu spät ist.
