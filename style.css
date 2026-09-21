@@ -57,6 +57,18 @@ header h1 {
     margin: 0px 0px 0px 20px;
 }
 
+header h1 a {
+    color: var(--text-color);
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.3s ease, text-decoration 0.3s ease;
+}
+
+header h1 a:hover {
+    text-decoration: underline;
+    transform: scale(1.05);
+}
+
 #menuButton {
     position: absolute;
     right: 20px;
@@ -67,6 +79,11 @@ header h1 {
     color: var(--text-color);
     cursor: pointer;
     transition: transform 0.3s ease;
+}
+
+#menuButton:hover {
+    transition: transform 0.3s ease;
+    transform: scale(1.05);
 }
 
 #menuButton.open {
@@ -118,4 +135,43 @@ footer nav a {
 footer nav a:hover {
     color: var(--text-color);
     text-decoration: underline;
+}
+
+.legal {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    line-height: 1.7;
+}
+
+.legal h2 {
+    margin-top: 0;
+    color: var(--accent-color);
+}
+
+.legal h3 {
+    margin: 2rem 0 0.5rem;
+    color: var(--primary-hover);
+}
+
+.legal-meta {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.legal ul {
+    padding-left: 1.5rem;
+}
+
+.legal li {
+    margin-bottom: 0.4rem;
+}
+
+.legal a {
+    color: var(--primary-hover);
+}
+
+.legal a:hover {
+    opacity: 0.8;
+    text-decoration: none;
 }
