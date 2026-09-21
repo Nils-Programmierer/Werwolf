@@ -34,6 +34,7 @@ html,
 body {
     height: 100%;
     margin: 0;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -174,4 +175,84 @@ footer nav a:hover {
 .legal a:hover {
     opacity: 0.8;
     text-decoration: none;
+}
+
+.legal h4 {
+    margin: 1.5rem 0 0.4rem;
+    color: var(--text-color);
+}
+
+.table-wrap {
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.legal table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.legal th,
+.legal td {
+    padding: 0.7rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.legal th {
+    background: var(--header-color);
+    color: var(--accent-color);
+}
+
+.legal tr:last-child td {
+    border-bottom: none;
+}
+
+.role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.role-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+}
+
+.role-card h4 {
+    margin: 0.6rem 0 0.4rem;
+}
+
+.role-card p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--bg-color);
+}
+
+.badge-village {
+    background: var(--success-color);
+}
+
+.badge-wolf {
+    background: var(--danger-color);
+}
+
+.badge-solo {
+    background: var(--accent-color);
 }

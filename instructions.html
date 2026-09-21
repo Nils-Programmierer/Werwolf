@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anleitung | Werwolf</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="index.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="img/icon512_rounded.png">
+</head>
+
+<body>
+
+    <header>
+        <h1>
+            <a href="index.html">Werwolf</a>
+        </h1>
+        <button id="menuButton">☰</button>
+
+        <nav id="menu" aria-label="Hauptnavigation">
+            <a href="index.html">Startseite</a>
+            <a href="instructions.html">Anleitung</a>
+            <a href="about.html">Über uns</a>
+        </nav>
+    </header>
+
+    <main>
+        <article class="legal">
+            <h2>Anleitung</h2>
+
+            <section>
+                <h3>Worum geht es?</h3>
+                <p>
+                    In einem Dorf treiben sich Werwölfe herum. Tagsüber sehen sie aus wie ganz
+                    normale Dorfbewohner, nachts fressen sie ihre Opfer. Das <strong>Dorf</strong>
+                    gewinnt, wenn alle Werwölfe besiegt sind. Die <strong>Werwölfe</strong> gewinnen,
+                    wenn sie nicht mehr in der Unterzahl sind und das Dorf besiegt haben.
+                </p>
+                <p>
+                    Ihr braucht <strong>keinen Erzähler</strong>. Das Gerät übernimmt diese Aufgabe
+                    und führt euch mit Ansagen durch das Spiel. Legt es am besten in die Mitte
+                    und stellt die Lautstärke so ein, dass alle es gut hören und jeder in der Lage ist auf das Gerät zu
+                    tippen.
+                </p>
+            </section>
+
+            <section>
+                <h3>So läuft eine Partie ab</h3>
+
+                <h4>1. Spiel einrichten</h4>
+                <p>
+                    Auf der Startseite gibst du die <strong>Namen aller Spieler</strong> ein und legst fest,
+                    <strong>wie oft jede Rolle</strong> vorkommt. Die Anzahl der Rollen sollte zur Anzahl der
+                    Spieler passen. Eine Empfehlung für die Anzahl der Werwölfe findest du weiter unten.
+                    Dann startest du das Spiel.
+                </p>
+
+                <h4>2. Rollen verteilen</h4>
+                <p>
+                    Das Gerät wird reihum weitergegeben. Wenn du dran bist, deckst du deine Rolle auf,
+                    merkst sie dir und versteckst sie wieder, bevor du das Gerät weitergibst.
+                    <strong>Niemand sonst darf deinen Bildschirm sehen.</strong>
+                </p>
+                <p>
+                    Du weißt nicht mehr, was deine Rolle kann? Tippe auf das <strong>Fragezeichen (?)</strong>.
+                    Dann bekommst du noch einmal eine Beschreibung deiner Rolle.
+                </p>
+
+                <h4>3. Die Nacht</h4>
+                <p>
+                    Sobald alle ihre Rolle kennen, führt das Gerät automatisch durch das Spiel. Alle
+                    schließen die Augen. Das Gerät ruft die Rollen nacheinander auf: Wer aufgerufen wird,
+                    öffnet die Augen und trifft seine Entscheidung, zum Beispiel wenn sich die Werwölfe
+                    ein Opfer aussuchen. Danach schließt er die Augen wieder. Immer wenn ihr fertig seid,
+                    tippt ihr auf das Gerät, damit es weitergeht.
+                </p>
+
+                <h4>4. Der Tag</h4>
+                <p>
+                    Alle wachen auf und das Gerät verkündet, wer in der Nacht gestorben ist. Ausgeschiedene
+                    Spieler decken ihre Rolle auf (falls nichts anderes angezeigt wird) und dürfen nicht
+                    mehr mitreden. Die Überlebenden diskutieren, wer ein Werwolf sein könnte, und stimmen
+                    dann ab. Wer die meisten Stimmen bekommt, scheidet aus und stirbt im Spiel.
+                </p>
+
+                <h4>5. Spielende</h4>
+                <p>
+                    Danach folgt die nächste Nacht. Das wiederholt sich, bis eine Gruppe gewonnen hat.
+                </p>
+            </section>
+
+            <section>
+                <h3>Empfehlung: Wie viele Werwölfe?</h3>
+                <p>
+                    Als Faustregel gilt: etwa ein Werwolf auf drei bis vier Spieler. Für das Spiel
+                    braucht ihr mindestens 5 Spieler, mehr macht deutlich mehr Spaß.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Spieler</th>
+                                <th>Werwölfe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>5 – 7</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>8 – 11</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <td>12 – 15</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td>16 – 19</td>
+                                <td>4</td>
+                            </tr>
+                            <tr>
+                                <td>20 und mehr</td>
+                                <td>5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Tipps:</strong> Der Weiße Wolf und das Wolfsjunge zählen zu den Werwölfen.
+                    Bei kleinen Runden solltet ihr mit wenigen Sonderrollen spielen und lieber mehrere
+                    normale Dorfbewohner einplanen. Bei großen Runden dürfen es ruhig mehr Sonderrollen
+                    sein.
+                </p>
+            </section>
+
+            <section>
+                <h3>Die Rollen</h3>
+
+                <div class="role-grid">
+
+                    <div class="role-card" id="villagerCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Dorfbewohner</h4>
+                        <p>
+                            Keine besondere Fähigkeit. Du hilfst dem Dorf, indem du gut zuhörst,
+                            klug diskutierst und die Werwölfe enttarnst.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="wolfCard">
+                        <span class="badge badge-wolf">Werwölfe</span>
+                        <h4>Werwolf</h4>
+                        <p>
+                            Jede Nacht wachen alle Werwölfe gemeinsam auf und einigen sich lautlos
+                            auf ein Opfer. Tagsüber gibst du dich als harmloser Dorfbewohner aus.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="seerCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Seher</h4>
+                        <p>
+                            Jede Nacht darfst du dir einen Spieler aussuchen und erfährst dessen
+                            Rolle. Nutze dein Wissen, aber verrate dich nicht zu früh, sonst wirst
+                            du selbst zum Ziel.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="witchCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Hexe</h4>
+                        <p>
+                            Du hast zwei Tränke, die du jeweils nur einmal pro Spiel einsetzen
+                            kannst: einen <strong>Heiltrank</strong>, der das Opfer der Werwölfe rettet,
+                            und einen <strong>Gifttrank</strong>, der einen beliebigen Spieler tötet.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="hunterCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Jäger</h4>
+                        <p>
+                            Wenn du stirbst, egal ob nachts oder durch die Abstimmung, darfst du
+                            mit deinem letzten Schuss sofort einen anderen Spieler mitnehmen.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="amorCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Amor</h4>
+                        <p>
+                            In der ersten Nacht bestimmst du zwei Spieler zum <strong>Liebespaar</strong>.
+                            Die beiden erfahren voneinander. Stirbt einer von ihnen, stirbt auch der
+                            andere vor Kummer.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="bodyguardCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Leibwächter</h4>
+                        <p>
+                            Jede Nacht beschützt du einen Spieler vor dem Angriff der Werwölfe.
+                            Du darfst dich selbst schützen, aber nicht zwei Nächte hintereinander
+                            denselben Spieler.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="wolfCubCard">
+                        <span class="badge badge-wolf">Werwölfe</span>
+                        <h4>Wolfsjunge</h4>
+                        <p>
+                            Du gehörst zu den Werwölfen. Wenn du stirbst, sind die anderen Werwölfe
+                            so wütend, dass sie in der folgenden Nacht <strong>zwei Opfer</strong>
+                            statt einem aussuchen dürfen.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="whiteWolfCard">
+                        <span class="badge badge-solo">Einzelgänger</span>
+                        <h4>Weißer Wolf</h4>
+                        <p>
+                            Du wirst wie ein Werwolf behandelt und nimmst an den nächtlichen Angriffen teil. Du bist
+                            aber ein Einzelgänger und gewinnst, wenn du der letzte Spieler bist, der noch lebt.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="bakerCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Bäcker</h4>
+                        <p>
+                            Jede Nacht backst du ein Brot und stopfst es in den Mund eines Spielers. Dieser Spieler darf
+                            am folgenden Tag nichts sagen, aber trotzdem noch an Abstimmungen teilnehmen. Du darfst
+                            nicht zwei Nächte hintereinander denselben Spieler auswählen.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="villageSlutCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Dorfmatratze</h4>
+                        <p>
+                            Jede Nacht suchst du dir einen Spieler aus, bei dem du übernachtest.
+                            Greifen die Werwölfe dich in dieser Nacht an, bist du nicht zu Hause
+                            und überlebst. Übernachtest du aber bei dem Opfer der Werwölfe, stirbst du mit. Du darfst
+                            nicht zwei Nächte hintereinander bei demselben Spieler übernachten.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="maidCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Magd</h4>
+                        <p>
+                            Wenn ein anderer Spieler stirbt und du noch keine andere Rolle hast, kannst du seine
+                            Rolle übernehmen. Du entscheidest selbst, ob du das möchtest. Erst dann erfährst du, welche
+                            Rolle es ist. Bis dahin bist du ein normaler Dorfbewohner.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="littleGirlCard">
+                        <span class="badge badge-village">Dorf</span>
+                        <h4>Kleines Mädchen</h4>
+                        <p>
+                            Du darfst nachts heimlich blinzeln und die Werwölfe beobachten. Aber
+                            Vorsicht: Wenn die Werwölfe dich dabei erwischen, bist du ihr nächstes
+                            Opfer.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="loversCard">
+                        <span class="badge badge-solo">Besonderheit</span>
+                        <h4>Liebespaar</h4>
+                        <p>
+                            Keine Rolle, die du auswählst: Das Liebespaar wird von Amor bestimmt.
+                            Die beiden behalten ihre eigene Rolle, dürfen sich aber gegenseitig
+                            nicht verraten und wollen den anderen um jeden Preis am Leben halten.
+                            Stirbt einer, stirbt auch der andere.
+                        </p>
+                    </div>
+
+                    <div class="role-card" id="mayorCard">
+                        <span class="badge badge-solo">Besonderheit</span>
+                        <h4>Bürgermeister</h4>
+                        <p>
+                            Deine Stimme zählt bei der Abstimmung doppelt. Wenn du stirbst, bestimmst
+                            du einen Nachfolger, der das Amt übernimmt. Der Bürgermeister wird nach der 1. Nacht gewählt
+                            von allen Spielern.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+            <section>
+                <h3>Wichtige Regeln für alle</h3>
+                <ul>
+                    <li>In der Nacht wird <strong>nicht gesprochen</strong>. Antworten gebt ihr nur durch Zeigen oder
+                        Tippen auf dem Gerät ab.</li>
+                    <li>Augen wirklich <strong>geschlossen</strong> lassen, bis das Gerät euch aufruft (Ausnahme: das
+                        Kleine Mädchen).</li>
+                    <li>Gebt beim Verteilen der Rollen das Gerät erst weiter, wenn eure Rolle wieder verdeckt ist.</li>
+                    <li>Ausgeschiedene Spieler bleiben still und verraten nichts.</li>
+                    <li>Ihr dürft alles behaupten, auch lügen. Nur eure Karte zeigen ist verboten.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>Viel Spaß!</h3>
+                <p>
+                    Fragen oder Ideen? Melde dich gerne über die <a href="about.html">Über-uns-Seite</a>.
+                </p>
+            </section>
+        </article>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Werwolf. Alle Rechte vorbehalten.</p>
+
+        <nav aria-label="Rechtliche Navigation">
+            <a href="imprint.html">Impressum</a>
+            <a href="privacy.html">Datenschutz</a>
+        </nav>
+    </footer>
+
+</body>
+
+</html>
