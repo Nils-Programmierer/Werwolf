@@ -30,6 +30,10 @@
     --font-size: 16px;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 html,
 body {
     height: 100%;
@@ -99,6 +103,7 @@ header h1 a:hover {
     background: var(--surface-color);
     padding: 10px;
     border-radius: 8px;
+    z-index: 1000;
 }
 
 #menu.open {
@@ -255,4 +260,169 @@ footer nav a:hover {
 
 .badge-solo {
     background: var(--accent-color);
+}
+
+
+
+
+
+
+.main-content {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.main-content h2 {
+    margin-top: 0;
+    color: var(--accent-color);
+}
+
+.configurations-game-section {
+    position: relative;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+}
+
+.configurations-game-section h3 {
+    margin-top: 0;
+    color: var(--primary-hover);
+}
+
+.counter {
+    position: absolute;
+    top: 10px;
+    right: 1.2rem;
+}
+
+.configurations-game-section input[type="text"] {
+    width: calc(100% - 120px);
+    padding: 0.5rem;
+    margin-right: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--header-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+}
+
+.configurations-game-section input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.add-btn {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    color: var(--bg-color);
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.add-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.playerListDisplay {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+.player-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.delete-btn {
+    padding: 0.3rem 0.6rem;
+    background: var(--danger-color);
+    border: none;
+    border-radius: 8px;
+    color: var(--bg-color);
+    font-family: var(--font-family);
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: var(--danger-hover);
+    transform: scale(1.05);
+}
+
+.character-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.character-item p {
+    margin: 5px 0;
+}
+
+.character-btn {
+    position: absolute;
+    right: 20px;
+    padding: 0.3rem 0.6rem;
+    background: var(--success-color);
+    border: none;
+    border-radius: 8px;
+    color: var(--bg-color);
+    font-family: var(--font-family);
+    font-size: 1.2rem;
+    margin-left: 10px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.character-btn:hover {
+    background: var(--success-hover);
+    transform: scale(1.05);
+}
+
+.remove-character-btn {
+    background: var(--danger-color);
+    right: 60px;
+}
+
+.remove-character-btn:hover {
+    background: var(--danger-hover);
+}
+
+.start-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--success-color);
+    border: none;
+    border-radius: 8px;
+    color: var(--bg-color);
+    font-size: 1.1rem;
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.start-btn:hover {
+    background: var(--success-hover);
+    transform: scale(1.05);
 }

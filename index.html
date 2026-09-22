@@ -27,7 +27,142 @@
     </header>
 
 
-    <main>
+    <main class="main-content">
+        <h2>Spiel starten</h2>
+
+        <section class="configurations-game-section">
+            <h3>Spieler</h3>
+            <p id="counterPlayer" class="counter">0 Spieler</p>
+
+            <ul id="playerListDisplay" class="playerListDisplay"></ul>
+
+            <form id="playerForm">
+                <input type="text" id="playerInput" placeholder="Spielername eingeben">
+                <button type="submit" class="add-btn">Spieler hinzufügen</button>
+            </form>
+        </section>
+
+        <section class="configurations-game-section">
+            <h3>Charaktere</h3>
+            <p id="counterCharacter" class="counter">2 Rollen</p>
+
+            <ul id="characterListDisplay" class="playerListDisplay">
+                <li class="character-item">
+                    <p id="villagerCount">1x Dorfbewohner</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('villager')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('villager')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="werewolfCount">1x Werwolf</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('werewolf')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('werewolf')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="seerCount">0x Seher</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('seer')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('seer')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="witchCount">0x Hexe</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('witch')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('witch')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="hunterCount">0x Jäger</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('hunter')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('hunter')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="cupidCount">0x Amor</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('cupid')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('cupid')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="bodyguardCount">0x Leibwächter</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('bodyguard')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('bodyguard')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="wolf_cubCount">0x Wolfsjunge</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('wolf_cub')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('wolf_cub')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="white_wolfCount">0x Weißer Wolf</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('white_wolf')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('white_wolf')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="bakerCount">0x Bäcker</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('baker')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('baker')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="village_slutCount">0x Dorfmatratze</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('village_slut')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('village_slut')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="maidCount">0x Magd</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('maid')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('maid')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="little_girlCount">0x Kleines Mädchen</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('little_girl')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('little_girl')">+</button>
+                </li>
+
+                <li class="character-item">
+                    <p id="mayorCount">0x Bürgermeister</p>
+                    <button class="remove-character-btn character-btn" aria-label="Rolle entfernen"
+                        onclick="removeCharacter('mayor')">-</button>
+                    <button class="character-btn" aria-label="Rolle hinzufügen"
+                        onclick="addCharacter('mayor')">+</button>
+                </li>
+            </ul>
+        </section>
+
+
+        <button id="startGameButton" class="start-btn">Spiel starten</button>
 
 
     </main>
