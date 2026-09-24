@@ -408,7 +408,7 @@ footer nav a:hover {
     background: var(--danger-hover);
 }
 
-.start-btn {
+.start-btn, .reset-btn {
     display: block;
     width: 100%;
     padding: 0.75rem;
@@ -422,7 +422,17 @@ footer nav a:hover {
     transition: background 0.3s ease, transform 0.3s ease;
 }
 
+.reset-btn {
+    background: var(--danger-color);
+    margin-top: 10px;
+}
+
 .start-btn:hover {
     background: var(--success-hover);
+    transform: scale(1.05);
+}
+
+.reset-btn:hover {
+    background: var(--danger-hover);
     transform: scale(1.05);
 }
