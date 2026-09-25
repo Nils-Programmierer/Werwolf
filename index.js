@@ -14,6 +14,20 @@ document.addEventListener("click", (event) => {
 });
 
 
+function ShowError(message) {
+    const errorContainer = document.createElement("div");
+    errorContainer.id = "errorMessage";
+    errorContainer.textContent = message;
+    errorContainer.classList.add("error-message");
+
+    document.body.appendChild(errorContainer);
+
+    setTimeout(() => {
+        document.body.removeChild(errorContainer);
+    }, 3000);
+}
+
+
 function loadFromLocalStorage() {
     const storedPlayers = localStorage.getItem("players");
     const storedRoles = localStorage.getItem("roles");
@@ -172,7 +186,7 @@ function addCharacter(characterName) {
         const characterNameGerman = count.textContent.replace(/^\d+x\s*/, '');
 
         if (characterNameGerman.toLowerCase() === "bürgermeister" && currentCount >= 1) {
-            alert("Es darf nur einen Bürgermeister geben.");
+            ShowError("Es darf nur einen Bürgermeister geben.");
             return;
         }
 
@@ -189,12 +203,12 @@ const startGameButton = document.getElementById("startGameButton");
 if (startGameButton) {
     startGameButton.addEventListener("click", () => {
         if (players.length < 4) {
-            alert("Bitte füge mindestens 4 Spieler hinzu, bevor du das Spiel startest."); //TODO: Alert durch ein schöneres Pop-up ersetzen.
+            ShowError("Bitte füge mindestens 4 Spieler hinzu, bevor du das Spiel startest.");
             return;
         }
 
         if (players.length !== characterCount) {
-            alert(`Die Anzahl der Spieler (${players.length}) muss der Anzahl der Rollen (${characterCount}) entsprechen.`);
+            ShowError(`Die Anzahl der Spieler (${players.length}) muss der Anzahl der Rollen (${characterCount}) entsprechen.`);
             return;
         }
 
@@ -203,7 +217,7 @@ if (startGameButton) {
         const hasWerewolf = roles.some(([roleName, count]) => roleName.toLowerCase() === "werwolf" && count > 0);
 
         if (!hasWerewolf) {
-            alert("Es muss mindestens einen Werwolf geben.");
+            ShowError("Es muss mindestens einen Werwolf geben.");
             return;
         }
 
@@ -226,7 +240,7 @@ if (startGameButton) {
         });
 
         if (!hasGoodPerson) {
-            alert("Es muss mindestens eine gute Person geben.");
+            ShowError("Es muss mindestens eine gute Person geben.");
             return;
         }
 
