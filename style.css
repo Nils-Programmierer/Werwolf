@@ -408,7 +408,8 @@ footer nav a:hover {
     background: var(--danger-hover);
 }
 
-.start-btn, .reset-btn {
+.start-btn,
+.reset-btn {
     display: block;
     width: 100%;
     padding: 0.75rem;
@@ -456,4 +457,113 @@ footer nav a:hover {
         width: 90%;
         font-size: 0.9rem;
     }
+}
+
+
+/* getRoles.html */
+.role-section {
+    position: relative;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+}
+
+.middle {
+    text-align: center;
+}
+
+.name {
+    margin-top: 0;
+    font-weight: bolder;
+    font-size: 1.5rem;
+    color: var(--primary-hover);
+}
+
+.card-container {
+    display: block;
+    width: 100%;
+    min-height: 300px;
+    padding: 0;
+    margin: 1rem 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    perspective: 1000px;
+    text-align: left;
+}
+
+.card-flipper {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    transform-style: preserve-3d;
+    transition: transform 0.7s ease;
+}
+
+.card-flipper.flipped {
+    transform: rotateY(180deg);
+}
+
+.card {
+    position: absolute;
+    inset: 0;
+    background: var(--surface-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-front {
+    transform: rotateY(0deg);
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}
+
+.card-container:hover .card-front {
+    transform: rotateY(0deg) scale(1.02);
+}
+
+.card-container:hover .card-back {
+    transform: rotateY(180deg) scale(1.02);
+}
+
+.card-container:hover .card {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.role-image {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+.role-name {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-hover);
+}
+
+.role-description {
+    margin: 0;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    color: var(--link-color);
+}
+
+.role-description:hover {
+    text-decoration: none;
 }

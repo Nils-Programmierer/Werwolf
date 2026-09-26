@@ -27,6 +27,26 @@ function ShowError(message) {
     }, 3000);
 }
 
+const roleIds = {
+    "Dorfbewohner": "villagerCount",
+    "Werwolf": "werewolfCount",
+    "Seher": "seerCount",
+    "Hexe": "witchCount",
+    "Jäger": "hunterCount",
+    "Amor": "cupidCount",
+    "Leibwächter": "bodyguardCount",
+    "Wolfsjunge": "wolf_cubCount",
+    "Weißer Wolf": "white_wolfCount",
+    "Bäcker": "bakerCount",
+    "Dorfmatratze": "village_slutCount",
+    "Magd": "maidCount",
+    "Kleines Mädchen": "little_girlCount",
+    "Bürgermeister": "mayorCount"
+};
+const playerForm = document.getElementById("playerForm");
+let players = [];
+let characterCount = 2;
+
 
 function loadFromLocalStorage() {
     const storedPlayers = localStorage.getItem("players");
@@ -42,22 +62,6 @@ function loadFromLocalStorage() {
 
     if (storedRoles) {
         const roles = JSON.parse(storedRoles);
-        const roleIds = {
-            "Dorfbewohner": "villagerCount",
-            "Werwolf": "werewolfCount",
-            "Seher": "seerCount",
-            "Hexe": "witchCount",
-            "Jäger": "hunterCount",
-            "Amor": "cupidCount",
-            "Leibwächter": "bodyguardCount",
-            "Wolfsjunge": "wolf_cubCount",
-            "Weißer Wolf": "white_wolfCount",
-            "Bäcker": "bakerCount",
-            "Dorfmatratze": "village_slutCount",
-            "Magd": "maidCount",
-            "Kleines Mädchen": "little_girlCount",
-            "Bürgermeister": "mayorCount"
-        };
 
         const totalRoles = roles.reduce((total, [, count]) => total + count, 0);
         document.getElementById("counterCharacter").textContent = `${totalRoles} Rollen`;
@@ -76,13 +80,12 @@ function loadFromLocalStorage() {
                 countElement.textContent = `${count}x ${roleName}`;
             }
         });
+
+        // TODO: Bürgermeister muss gegebenenfalls von characterCount abgezogen werden, da er nicht zugeordnet wird
+        characterCount = totalRoles;
     }
 }
 
-
-const playerForm = document.getElementById("playerForm");
-let players = [];
-let characterCount = 2;
 
 if (playerForm) {
     playerForm.addEventListener("submit", (event) => {
@@ -269,7 +272,7 @@ function GetRoles() {
     return roles;
 }
 
-
+// TODO: Bürgermeister darf nicht zugeordnet werden einem Spieler
 function assignRolesToPlayers(roles, players) {
     const roleList = [];
 
@@ -317,4 +320,66 @@ if (resetGameButton) {
         localStorage.removeItem("playerRoles");
         window.location.reload();
     });
+}
+
+// getRoles.html functions
+async function NextRole() {
+    const playerRolesJSON = localStorage.getItem("playerRoles");
+    if (!playerRolesJSON) {
+        console.error("Keine Spielerrollen im Local Storage gefunden.");
+        window.location.href = "index.html";
+        return;
+    }
+
+    const playerRoles = JSON.parse(playerRolesJSON);
+
+    if (playerRoles.length === 0) {
+        console.error("Keine Spielerrollen im Local Storage gefunden.");
+        window.location.href = "index.html";
+        return;
+    }
+
+    const currentIndex = parseInt(localStorage.getItem("currentRoleIndex")) || 0;
+
+    if (currentIndex >= playerRoles.length) {
+        localStorage.removeItem("currentRoleIndex");
+        window.location.href = "game.html";
+        return;
+    }
+
+    if (currentIndex === (playerRoles.length - 1)) {
+        const nextButton = document.getElementById("nextRoleButton");
+        if (nextButton) {
+            nextButton.textContent = "Spiel starten";
+        }
+    }
+
+    const currentPlayerRole = playerRoles[currentIndex];
+
+    // Karte auf Vorderseite drehen
+    const card = document.getElementById("card");
+    if (card && card.classList.contains("flipped")) {
+        card.classList.remove("flipped");
+    }
+
+    setTimeout(() => {
+        const playerNameElement = document.getElementById("name");
+        const roleNameElement = document.getElementById("role-name");
+        const roleDescriptionElement = document.getElementById("role-description");
+        const roleImageElement = document.getElementById("role-image");
+
+        if (playerNameElement && roleNameElement) {
+            playerNameElement.textContent = currentPlayerRole.player.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+            roleNameElement.textContent = currentPlayerRole.role;
+            roleDescriptionElement.href = `instructions.html#${roleIds[currentPlayerRole.role].toLowerCase().replace(/ /g, "_").replace("count", "Card")}`;
+            roleImageElement.src = `img/roles/${roleIds[currentPlayerRole.role].toLowerCase().replace(/ /g, "_").replace("count", "")}.jpg`;
+        }
+
+        localStorage.setItem("currentRoleIndex", currentIndex + 1);
+    }, 500);
+}
+
+function flipCard() {
+    const card = document.getElementById("card");
+    card.classList.toggle("flipped");
 }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deine Rolle | Werwolf</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="index.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="img/icon512_rounded.png">
+</head>
+
+<body onload="NextRole();">
+
+    <header>
+        <h1>
+            <a href="index.html">Werwolf</a>
+        </h1>
+        <button id="menuButton">☰</button>
+
+        <nav id="menu" aria-label="Hauptnavigation">
+            <a href="index.html">Startseite</a>
+            <a href="instructions.html">Anleitung</a>
+            <a href="about.html">Über uns</a>
+        </nav>
+    </header>
+
+
+    <main class="main-content">
+        <h2 class="middle">Deine Rolle</h2>
+
+        <section class="role-section">
+            <h3 class="middle name" id="name">Max</h3>
+
+            <button type="button" class="card-container" onclick="flipCard()">
+                <div id="card" class="card-flipper">
+                    <div id="frontCard" class="card card-front">
+                        <img src="img/icon512_maskable.png" alt="Dorfbewohner" class="role-image">
+                    </div>
+
+                    <div id="backCard" class="card card-back">
+                        <p id="role-name" class="role-name">Rolle</p>
+                        <a id="role-description" href="#" class="role-description">Aufgabe vergessen?</a>
+                        <img id="role-image" src="img/roles/baker.jpg" alt="Rollenbild" class="role-image">
+                    </div>
+                </div>
+            </button>
+
+            <button id="nextRoleButton" class="start-btn" onclick="NextRole()">Nächste Person</button>
+        </section>
+
+    </main>
+
+
+
+    <footer>
+        <p>&copy; 2026 Werwolf. Alle Rechte vorbehalten.</p>
+
+        <nav aria-label="Rechtliche Navigation">
+            <a href="imprint.html">Impressum</a>
+            <a href="privacy.html">Datenschutz</a>
+        </nav>
+    </footer>
+
+</body>
+
+</html>
