@@ -63,7 +63,12 @@ function loadFromLocalStorage() {
     if (storedRoles) {
         const roles = JSON.parse(storedRoles);
 
-        const totalRoles = roles.reduce((total, [, count]) => total + count, 0);
+        let totalRoles = roles.reduce((total, [, count]) => total + count, 0);
+
+        if (roles.some(([roleName, count]) => roleName.toLowerCase() === "bürgermeister" && count > 0)) {
+            totalRoles = totalRoles - 1;
+        }
+
         document.getElementById("counterCharacter").textContent = `${totalRoles} Rollen`;
 
         roles.forEach(([roleName, count]) => {
@@ -81,7 +86,6 @@ function loadFromLocalStorage() {
             }
         });
 
-        // TODO: Bürgermeister muss gegebenenfalls von characterCount abgezogen werden, da er nicht zugeordnet wird
         characterCount = totalRoles;
     }
 }
@@ -272,11 +276,18 @@ function GetRoles() {
     return roles;
 }
 
-// TODO: Bürgermeister darf nicht zugeordnet werden einem Spieler
 function assignRolesToPlayers(roles, players) {
     const roleList = [];
 
+    const hasCupid = roles.some(([roleName, count]) =>
+        roleName.trim().toLowerCase() === "amor" && count > 0
+    );
+
     roles.forEach(([roleName, count]) => {
+        if (roleName.trim().toLowerCase() === "bürgermeister") {
+            return;
+        }
+
         for (let i = 0; i < count; i++) {
             roleList.push(roleName);
         }
@@ -284,11 +295,21 @@ function assignRolesToPlayers(roles, players) {
 
     shuffleArray(roleList);
 
+    const playerNumbers = shuffleArray(
+        Array.from({ length: players.length }, (_, index) => index + 1)
+    );
+
     const playerRoles = players.map((player, index) => {
-        return {
+        const playerRole = {
             player: player,
             role: roleList[index]
         };
+
+        if (hasCupid) {
+            playerRole.playerNumber = playerNumbers[index];
+        }
+
+        return playerRole;
     });
 
     const playerRolesJSON = JSON.stringify(playerRoles);
@@ -297,6 +318,8 @@ function assignRolesToPlayers(roles, players) {
     localStorage.setItem("players", JSON.stringify(players));
     localStorage.setItem("roles", JSON.stringify(roles));
     localStorage.setItem("playerRoles", playerRolesJSON);
+
+    localStorage.removeItem("currentRoleIndex");
 
     window.location.href = "getRoles.html";
 }
@@ -370,7 +393,9 @@ async function NextRole() {
 
         if (playerNameElement && roleNameElement) {
             playerNameElement.textContent = currentPlayerRole.player.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-            roleNameElement.textContent = currentPlayerRole.role;
+            roleNameElement.textContent = currentPlayerRole.playerNumber
+                ? `${currentPlayerRole.role} (Spieler ${currentPlayerRole.playerNumber})`
+                : currentPlayerRole.role;
             roleDescriptionElement.href = `instructions.html#${roleIds[currentPlayerRole.role].toLowerCase().replace(/ /g, "_").replace("count", "Card")}`;
             roleImageElement.src = `img/roles/${roleIds[currentPlayerRole.role].toLowerCase().replace(/ /g, "_").replace("count", "")}.jpg`;
         }

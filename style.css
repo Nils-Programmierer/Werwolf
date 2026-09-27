@@ -374,6 +374,18 @@ footer nav a:hover {
     margin: 5px 0;
 }
 
+.info-link {
+    color: var(--primary-hover);
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 1.2rem;
+}
+
+a.info-link:hover {
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
 .character-btn {
     position: absolute;
     right: 20px;
