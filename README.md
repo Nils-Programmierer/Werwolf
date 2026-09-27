@@ -11,7 +11,7 @@ Werwolf ist ein spannendes Partyspiel voller Täuschung, Diskussionen und überr
 
 ## Funktionen
 - Mehr als 10 verschiedene Rollen mit einzigartigen Fähigkeiten und Strategien
-- Unterstützung für bis zu 20 Spieler gleichzeitig
+- Unterstützung für mehr als 40 Spieler gleichzeitig
 - Komplett ohne Erzähler: die Web-App übernimmt die gesamte Spielleitung
 - Eine intuitive und übersichtliche Benutzeroberfläche für ein einfaches und zugängliches Spielerlebnis
 
@@ -50,6 +50,13 @@ Klone dieses Repository auf deinen lokalen Rechner:
 ```bash
 git clone https://github.com/Nils-Programmierer/Werwolf.git
 ```
+
+**Website**
+
+Nutze die Web-App direkt über die folgende URL:
+
+[https://nils-programmierer.github.io/Werwolf/](https://nils-programmierer.github.io/Werwolf/)
+
 
 ## Beitragende
 
