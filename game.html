@@ -7,7 +7,7 @@
     <title>Spiel | Werwolf</title>
     <link rel="stylesheet" href="style.css">
     <script defer src="index.js"></script>
-    <script defer src="game.js"></script>
+    <script defer type="module" src="game.js"></script>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="img/icon512_rounded.png">
 </head>
@@ -29,10 +29,31 @@
 
 
     <main class="main-content">
+        <section id="loadingScreen">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+
+                <h2 id="loadingTitle">Spiel wird vorbereitet...</h2>
+
+                <p id="loadingText">
+                    Bitte einen Moment warten.
+                </p>
+
+                <div class="loading-bar">
+                    <div id="loadingProgress"></div>
+                </div>
+
+                <div id="loadingPercentage">0 %</div>
+            </div>
+        </section>
 
 
 
     </main>
+
+
+
+
 
 
 

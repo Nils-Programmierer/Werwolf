@@ -39,8 +39,8 @@
                 </p>
                 <ul>
                     <li>Es gibt <strong>keine Anmeldung und keine Registrierung</strong>.</li>
-                    <li>Es gibt <strong>keine Verbindung zu externen Diensten</strong> (keine APIs, kein Tracking, keine
-                        Werbung, keine Analyse-Tools).</li>
+                    <li>Es gibt <strong>keine Analyse-, Tracking- oder Werbedienste</strong>. Für die Sprachausgabe
+                        werden jedoch Modellressourcen von externen Anbietern geladen (siehe Abschnitt 4).</li>
                     <li>Einstellungen und Spielstände werden ausschließlich <strong>lokal in deinem Browser</strong>
                         (localStorage) gespeichert und nicht an uns übertragen.</li>
                 </ul>
@@ -64,14 +64,30 @@
             </section>
 
             <section>
-                <h3>4. Keine Verbindung zu externen Diensten</h3>
+                <h3>4. Lokale Sprachausgabe und externe Dienste</h3>
                 <p>
-                    Diese Website bindet keine externen Dienste ein. Es werden insbesondere keine
-                    externen APIs, Schriftarten-Server, Content-Delivery-Networks, Analyse- oder
-                    Tracking-Tools, Social-Media-Plugins oder Werbenetzwerke verwendet. Alle
-                    benötigten Dateien (z. B. die Schriftart Montserrat, Bilder, Skripte) werden
-                    direkt von unserem eigenen Server geladen. Es findet keine Weitergabe von Daten
-                    an Dritte statt.
+                    Die Sprachsynthese (Text-to-Speech) verwendet das Supertonic-3-Modell und wird
+                    lokal im Browser ausgeführt. Die ONNX-Modelle und Konfigurationsdateien werden
+                    von Hugging Face (huggingface.co) geladen; das Stimmprofil M1.json wird ebenfalls
+                    von dort abgerufen. Das JavaScript-Modul ONNX Runtime Web wird von unpkg.com
+                    geladen. Beim ersten Spielstart kann dadurch ein größerer Download anfallen.
+                    ONNX-Modellantworten werden in der Cache API des Browsers gespeichert, damit sie
+                    bei späteren Aufrufen wiederverwendet werden können. Das Stimmprofil wird
+                    vom Anwendungscode nicht in diesem Cache gespeichert.
+                </p>
+                <p>
+                    Der vorzulesende Text wird nicht an Hugging Face, unpkg oder einen externen
+                    Sprachsynthese-Dienst gesendet. Die Sprachausgabe wird im Browser erzeugt und
+                    abgespielt. Beim Abruf der Ressourcen übermitteln Browser technisch notwendige
+                    Verbindungsdaten, insbesondere die IP-Adresse und angeforderte URL, an die
+                    jeweiligen Anbieter. Für deren Verarbeitung gelten zusätzlich deren
+                    Datenschutzinformationen und Bedingungen.
+                </p>
+                <p>
+                    Es werden keine Analyse- oder Tracking-Tools, Social-Media-Plugins oder
+                    Werbenetzwerke eingebunden. Externe Links, etwa zu GitHub, werden erst geöffnet,
+                    wenn du sie anklickst. Der Hosting-Anbieter verarbeitet technische Verbindungsdaten;
+                    dazu siehe Abschnitt "Hosting und Server-Logfiles".
                 </p>
             </section>
 
@@ -124,7 +140,13 @@
                     nicht statt.
                 </p>
                 <p>
-                    Hosting-Anbieter: GitHub Pages, 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA
+                    F&uuml;r die ver&ouml;ffentlichte Website wird GitHub Pages als Hosting-Anbieter genutzt:
+                    GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA. Welche
+                    Verbindungsdaten dabei verarbeitet werden und wie lange sie gespeichert werden,
+                    richtet sich auch nach den Datenschutzinformationen und Bedingungen von GitHub.
+                    Weitere Informationen:
+                    <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages#data-collection"
+                        target="_blank" rel="noopener noreferrer">GitHub Pages &ndash; Data collection</a>.
                 </p>
                 <p>
                     Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an
