@@ -1,6 +1,10 @@
 let playerRoles = [];
+let choicesInTheNight = {};
+let lovers = [];
 let step = 0;
 let round = 0;
+
+const task = document.getElementById("task");
 
 let textToSpeech = null;
 let voiceStyle = null;
@@ -61,7 +65,6 @@ async function LoadData() {
     }
 
     console.log("Loaded playerRoles:", playerRoles);
-    StartNight();
 }
 
 
@@ -133,9 +136,7 @@ async function initGame() {
 
         console.log("Spiel und TTS vollständig geladen.");
         hideLoadingScreen();
-
-        await speech("Willkommen zum Spiel Werwolf. Bitte wähle deine Rolle aus.");
-
+        document.getElementById("startSection").style.display = "block";
     } catch (error) {
         console.error("Fehler beim Starten:", error);
     }
@@ -144,73 +145,199 @@ async function initGame() {
 initGame();
 
 
+document.getElementById("startButton").addEventListener("click", async () => {
+    document.getElementById("startSection").style.display = "none";
+    await speech("Willkommen zum Spiel Werwolf.");
+    await StartNight();
+});
 
-function StartNight() {
+
+async function StartNight() {
     round++;
     step = 0;
-    WakeUpAtNight();
+    task.textContent = "Die Nacht beginnt. Alle Spieler schlafen ein.";
+    await speech("Die Nacht beginnt. Alle Spieler schlafen ein.");
+    await WakeUpAtNight();
 }
 
 
-function WakeUpAtNight() {
+async function WakeUpAtNight() {
     step++;
 
-
     // TODO: Amor (Liebespaar), Seher, Hexe, Leibwächter, Bäcker, Dorfmatratze kann es öfters geben
+
+    // Amor
     if (step === 1 && round === 1 && playerRoles.some(player => player.role === "Amor")) {
-        // Amor
+        task.textContent = "Der Amor wacht auf.";
+        await speech("Als erstes wacht der Amor auf. Bitte wähle zwei Spieler, die ein Liebespaar werden sollen.");
+        const [numberOfLovers, numberOfLovers2] = await showSelection("Wer soll das Liebespaar werden?", 2, playerRoles.filter(player => player.role !== "Amor").map(player => player.playerNumber));
+        lovers.push(numberOfLovers, numberOfLovers2);
+        choicesInTheNight["Amor"] = [numberOfLovers, numberOfLovers2];
+
+        task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
+        await speech("Bitte schließe nun die Augen und schlafe wieder ein.");
     }
 
 
+    // Liebespaar
     if (step === 2 && round === 1 && playerRoles.some(player => player.role === "Amor")) {
-        // Liebespaar
+        const lover1 = playerRoles.find(player => player.playerNumber === lovers[0]).player;
+        const lover2 = playerRoles.find(player => player.playerNumber === lovers[1]).player;
+
+        task.textContent = lover1.charAt(0).toUpperCase() + lover1.slice(1) + " und " + lover2.charAt(0).toUpperCase() + lover2.slice(1) + " dürfen sich ineinander verlieben.";
+
+        await speech(`Der Amor hat seine Wahl getroffen. Die beiden Spieler sind nun ein Liebespaar. Spieler ${lovers[0]} und Spieler ${lovers[1]} dürfen aufwachen und sich ineinander verlieben.`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        task.textContent = "Bitte schließt nun die Augen und schlaft wieder ein.";
+        await speech("Das Liebespaar hat sich nun unsterblich ineinander verliebt. Es darf nun wieder schlafen gehen.");
     }
 
-
+    // TODO: Achtung Opfer kann auch zwei oder mehr sein, wenn Baby Werwolf oder mehrere Baby Werwölfe gestorben sind
+    // Werwölfe
     if (step === 3 && playerRoles.some(player => player.role === "Werwolf")) {
-        // Werwölfe
+        task.textContent = "Die Werwölfe wachen auf.";
+        await speech("Die Werwölfe wachen auf. Bitte wählt gemeinsam ein Opfer, das in dieser Nacht sterben soll.");
+
+        const possibleVictims = playerRoles.filter(player => player.role !== "Werwolf" && player.role !== "Wolfsjunge" && player.role !== "Weißer Wolf").map(player => player.playerNumber);
+        console.log("Mögliche Opfer:", possibleVictims);
+        const [victim] = await showSelection("Wählt ein Opfer aus.", 1, possibleVictims);
+        choicesInTheNight["Werwolf"] = victim;
+
+        task.textContent = "Bitte schließt nun die Augen und schlaft wieder ein.";
+        await speech(`Die Werwölfe haben ein Opfer gewählt. Bitte schließt nun die Augen und schlaft wieder ein.`);
     }
 
 
+    // Seher
     if (step === 4 && playerRoles.some(player => player.role === "Seher")) {
-        // Seher
+        task.textContent = "Der Seher wacht auf.";
+        await speech("Der Seher wacht auf. Bitte wähle einen Spieler, dessen Rolle du erfahren möchtest.");
+
+        const [seerChoice] = await showSelection("Wähle einen Spieler aus, dessen Rolle du erfahren möchtest.", 1, playerRoles.filter(player => player.role !== "Seher").map(player => player.playerNumber));
+        choicesInTheNight["Seher"] = seerChoice;
+        let seerRole = playerRoles.find(player => player.playerNumber === seerChoice).role;
+
+        if (seerRole === "Werwolf" || seerRole === "Wolfsjunge" || seerRole === "Weißer Wolf") {
+            seerRole = "böse";
+        } else {
+            seerRole = "gut"
+        }
+
+        task.textContent = `${playerRoles.find(player => player.playerNumber === seerChoice).player.charAt(0).toUpperCase() + playerRoles.find(player => player.playerNumber === seerChoice).player.slice(1)} ist ${seerRole}.`;
+        await speech(`Die Rolle von diesem Spieler wird dir nun verraten.`);
+
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
+        await speech("Bitte schließe nun die Augen und schlafe wieder ein.");
     }
 
 
+    //TODO: Falls Heiltrank oder Gifttrank noch nicht eingesetzt wurden, dann kann die Hexe aufwachen
     if (step === 5 && playerRoles.some(player => player.role === "Hexe")) {
+        task.textContent = "Die Hexe wacht auf.";
+        await speech("Die Hexe wacht auf. Bitte wähle, ob du dein Heiltrank oder Gifttrank einsetzen möchtest.");
         // Hexe
     }
 
 
+    //TODO: Beachte, es darf nicht zweimal hintereinander die gleiche Person beschützt werden (Letzter Parameter in showSelection)
+    // Leibwächter
     if (step === 6 && playerRoles.some(player => player.role === "Leibwächter")) {
-        // Leibwächter
+        task.textContent = "Der Leibwächter wacht auf.";
+        await speech("Der Leibwächter wacht auf. Bitte wähle einen Spieler, den du schützen möchtest.");
+
+        const [bodyguardChoice] = await showSelection("Wähle einen Spieler aus, den du schützen möchtest.", 1, playerRoles.map(player => player.playerNumber));
+        choicesInTheNight["Leibwächter"] = bodyguardChoice;
+
+        task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
+        await speech("Bitte schließe nun die Augen und schlafe wieder ein.");
     }
 
 
+    //TODO: Beachte, es darf nicht zweimal hintereinander die gleiche Person das Maul gestopft werden (Letzter Parameter in showSelection)
+    // Bäcker
     if (step === 7 && playerRoles.some(player => player.role === "Bäcker")) {
-        // Bäcker
+        task.textContent = "Der Bäcker wacht auf.";
+        await speech("Der Bäcker wacht auf. Bitte wähle einen Spieler, den du in dieser Nacht das Maul stopfen möchtest.");
+
+        const [bakerChoice] = await showSelection("Wähle einen Spieler aus, den du das Maul stopfen möchtest.", 1, playerRoles.filter(player => player.role !== "Bäcker").map(player => player.playerNumber));
+        choicesInTheNight["Bäcker"] = bakerChoice;
+
+        task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
+        await speech("Bitte schließe nun die Augen und schlafe wieder ein.");
     }
 
 
+
+    //TODO: Beachte, es darf nicht zweimal hintereinander die Dorfmatratze bei der gleichen Person schlafen (Letzter Parameter in showSelection)
+    // Dorfmatratze
     if (step === 8 && playerRoles.some(player => player.role === "Dorfmatratze")) {
-        // Dorfmatratze
+        task.textContent = "Die Dorfmatratze wacht auf.";
+        await speech("Die Dorfmatratze wacht auf. Bitte wähle einen Spieler, bei dem du in dieser Nacht schlafen möchtest.");
+
+        const [villageSlutChoice] = await showSelection("Wähle einen Spieler aus, bei dem du schlafen möchtest.", 1, playerRoles.filter(player => player.role !== "Dorfmatratze").map(player => player.playerNumber));
+        choicesInTheNight["Dorfmatratze"] = villageSlutChoice;
+
+        task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
+        await speech("Bitte schließe nun die Augen und schlafe wieder ein.");
     }
 
 
 
     // Falls noch jemand aufzuwecken ist, dann wird die nächste Rolle aufgeweckt
     if (step < 8) {
-        WakeUpAtNight();
+        await WakeUpAtNight();
     } else {
-        //MakeDay();
+        task.textContent = "Die Nacht ist vorbei. Alle Spieler wachen auf.";
+        await speech("Die Nacht ist vorbei. Alle Spieler wachen auf.");
+        await MakeDay();
     }
 }
 
 
+function showSelection(promptText, numberOfSelections, playerNumbers) {
+    return new Promise((resolve) => {
+        const userSelection = document.getElementById("selectionButtons");
+        task.textContent = promptText;
+        const selectedPlayers = [];
 
-function MakeDay() {
+        playerRoles.forEach(player => {
+            if (!playerNumbers.includes(player.playerNumber)) {
+                return;
+            }
+
+            const button = document.createElement("button");
+            button.classList.add("selectionButton");
+            button.type = "button";
+            button.textContent = player.player.charAt(0).toUpperCase() + player.player.slice(1);
+
+            button.addEventListener("click", async () => {
+                if (selectedPlayers.includes(player.playerNumber)) {
+                    return;
+                }
+
+                selectedPlayers.push(player.playerNumber);
+                button.disabled = true;
+
+                if (selectedPlayers.length >= numberOfSelections) {
+                    userSelection.innerHTML = "";
+                    task.textContent = "";
+                    await speech("Eine Entscheidung wurde getroffen.");
+                    resolve(selectedPlayers);
+                }
+            });
+
+            userSelection.appendChild(button);
+        });
+    });
+}
+
+
+
+async function MakeDay() {
     const deadPlayers = MakeResultNight();
-    ShowResultNight(deadPlayers);
+    ShowResultNight(deadPlayers); //TODO: Falls Magd dabei ist, noch nicht die Rollen verraten, sondern erst wenn die Magd ablehnt, dann die Rollen verraten
 
 
     if (IsGameOver()) {
@@ -262,19 +389,18 @@ async function speech(text) {
         );
 
         const url = URL.createObjectURL(blob);
-
         const audio = new Audio(url);
 
-        audio.addEventListener("ended", () => {
-            URL.revokeObjectURL(url);
-        }, { once: true });
+        await new Promise((resolve, reject) => {
+            audio.addEventListener("ended", resolve, { once: true });
+            audio.addEventListener("error", reject, { once: true });
 
-        await audio.play();
+            audio.play().catch(reject);
+        });
+
+        URL.revokeObjectURL(url);
 
     } catch (error) {
         console.error("TTS FEHLER:", error);
     }
 }
-
-
-window.speech = speech;

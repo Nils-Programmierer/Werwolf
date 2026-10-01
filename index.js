@@ -279,10 +279,6 @@ function GetRoles() {
 function assignRolesToPlayers(roles, players) {
     const roleList = [];
 
-    const hasCupid = roles.some(([roleName, count]) =>
-        roleName.trim().toLowerCase() === "amor" && count > 0
-    );
-
     roles.forEach(([roleName, count]) => {
         if (roleName.trim().toLowerCase() === "bürgermeister") {
             return;
@@ -305,10 +301,7 @@ function assignRolesToPlayers(roles, players) {
             role: roleList[index]
         };
 
-        if (hasCupid) {
-            playerRole.playerNumber = playerNumbers[index];
-        }
-
+        playerRole.playerNumber = playerNumbers[index];
         return playerRole;
     });
 

@@ -42,7 +42,7 @@ body {
 }
 
 body {
-    min-height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     margin: 0;
@@ -272,6 +272,9 @@ footer nav a:hover {
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .main-content h2 {
@@ -482,7 +485,7 @@ a.info-link:hover {
     margin: 1rem 0;
 }
 
-.middle {
+.text-middle {
     text-align: center;
 }
 
@@ -654,4 +657,56 @@ a.info-link:hover {
     margin-top: 0.75rem;
     color: var(--text-muted);
     font-size: 0.9rem;
+}
+
+.middle {
+    width: 100%;
+}
+
+.startSection {
+    text-align: center;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    display: none;
+}
+
+#selectionButtons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.selectionButton {
+    width: 200px;
+    padding: 0.75rem;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    color: var(--bg-color);
+    font-size: 1.1rem;
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.selectionButton:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.selectionButton:disabled {
+    background: var(--border-color);
+    cursor: not-allowed;
+}
+
+.selectionTask {
+    margin: 1rem 0;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    text-align: center;
 }
