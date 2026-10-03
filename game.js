@@ -2,6 +2,7 @@ let playerRoles = [];
 let choicesInTheNight = {};
 let choicesLastNight = {};
 let lovers = [];
+let potionWitch = [];
 let werewolfVictimCount = 1;
 let step = 0;
 let round = 0;
@@ -240,11 +241,58 @@ async function WakeUpAtNight() {
     }
 
 
-    //TODO: Falls Heiltrank oder Gifttrank noch nicht eingesetzt wurden, dann kann die Hexe aufwachen
+    // Hexe
     if (step === 5 && playerRoles.some(player => player.role === "Hexe")) {
         task.textContent = "Die Hexe wacht auf.";
-        await speech("Die Hexe wacht auf. Bitte wähle, ob du dein Heiltrank oder Gifttrank einsetzen möchtest.");
-        // Hexe
+        await speech(`Die Hexe wacht auf. ${choicesInTheNight["Werwolf"].length > 1 ? "Die Opfer der Werwölfe werden dir nun verraten." : "Das Opfer der Werwölfe wird dir nun verraten."}`);
+
+        if (choicesInTheNight["Werwolf"].length > 1) {
+            task.textContent = "Opfer der Werwölfe: " + choicesInTheNight["Werwolf"].map(victim => playerRoles.find(player => player.playerNumber === victim).player.charAt(0).toUpperCase() + playerRoles.find(player => player.playerNumber === victim).player.slice(1)).join(", ");
+        } else {
+            task.textContent = "Opfer der Werwölfe: " + playerRoles.find(player => player.playerNumber === choicesInTheNight["Werwolf"][0]).player.charAt(0).toUpperCase() + playerRoles.find(player => player.playerNumber === choicesInTheNight["Werwolf"][0]).player.slice(1);
+        }
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        const hasHealOnPlayer = potionWitch.some(
+            ([potion, playerId]) => potion === "heal" && playerId === playerRoles.filter(player => player.role === "Hexe").map(player => player.playerNumber)[0]
+        );
+
+        if (!hasHealOnPlayer) {
+            await speech(`Du darfst nun entscheiden, ob du deinen Heiltrank einsetzen möchtest, um ${choicesInTheNight["Werwolf"].length > 1 ? "ein" : "das"} Opfer zu retten.`);
+            const [witchChoiceHeal] = await showTwoSelection("Möchtest du deinen Heiltrank einsetzen?", 1, ["Heiltrank", "Kein Heiltrank"]);
+
+            if (witchChoiceHeal === "Heiltrank") {
+                await speech("Du darfst nun entscheiden, welchen Spieler du mit deinem Heiltrank retten möchtest.");
+                const [witchHealChoice] = await showSelection("Wähle einen Spieler, den du mit deinem Heiltrank retten möchtest.", 1, choicesInTheNight["Werwolf"]);
+                choicesInTheNight["HexeHeal"] = [witchHealChoice, playerRoles.find(player => player.role === "Hexe").playerNumber];
+                potionWitch.push(["heal", playerRoles.find(player => player.role === "Hexe").playerNumber]);
+
+                task.textContent = "Du hast deinen Heiltrank eingesetzt.";
+                await speech("Du hast deinen Heiltrank eingesetzt.");
+            }
+        }
+
+        const hasPoisonOnPlayer = potionWitch.some(
+            ([potion, playerId]) => potion === "poison" && playerId === playerRoles.filter(player => player.role === "Hexe").map(player => player.playerNumber)[0]
+        );
+
+        if (!hasPoisonOnPlayer) {
+            await speech("Du darfst nun entscheiden, ob du deinen Gifttrank einsetzen möchtest, um einen Spieler zu töten.");
+            const [witchChoicePoison] = await showTwoSelection("Möchtest du deinen Gifttrank einsetzen?", 1, ["Gifttrank", "Kein Gifttrank"]);
+
+            if (witchChoicePoison === "Gifttrank") {
+                await speech("Du darfst nun entscheiden, welchen Spieler du mit deinem Gifttrank töten möchtest.");
+                const [witchPoisonChoice] = await showSelection("Wähle einen Spieler, den du mit deinem Gifttrank töten möchtest.", 1, playerRoles.filter(player => player.role !== "Hexe").map(player => player.playerNumber));
+                choicesInTheNight["HexePoison"] = [witchPoisonChoice, playerRoles.find(player => player.role === "Hexe").playerNumber];
+                potionWitch.push(["poison", playerRoles.find(player => player.role === "Hexe").playerNumber]);
+
+                task.textContent = "Du hast deinen Gifttrank eingesetzt.";
+                await speech("Du hast deinen Gifttrank eingesetzt.");
+            }
+        }
+
+        task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
+        await speech("Bitte schließe nun die Augen und schlafe wieder ein.");
     }
 
 
@@ -337,19 +385,58 @@ function showSelection(promptText, numberOfSelections, playerNumbers) {
 }
 
 
+function showTwoSelection(promptText, numberOfSelections, options) {
+    return new Promise((resolve) => {
+        const userSelection = document.getElementById("selectionButtons");
+        task.textContent = promptText;
+        const selectedOptions = [];
+
+        options.forEach(option => {
+            const button = document.createElement("button");
+            button.classList.add("selectionButton");
+            button.type = "button";
+            button.textContent = option;
+
+            button.addEventListener("click", async () => {
+                if (selectedOptions.includes(option)) {
+                    return;
+                }
+
+                selectedOptions.push(option);
+                button.disabled = true;
+
+                if (selectedOptions.length >= numberOfSelections) {
+                    userSelection.innerHTML = "";
+                    task.textContent = "";
+                    await speech("Eine Entscheidung wurde getroffen.");
+                    resolve(selectedOptions);
+                }
+            });
+
+            userSelection.appendChild(button);
+        });
+    });
+}
+
+
 
 async function MakeDay() {
     const deadPlayers = MakeResultNight();
     console.log("Tote Spieler:", deadPlayers);
     console.log("Anzahl der Opfer der Werwölfe für die nächste Nacht:", werewolfVictimCount);
-    ShowResultNight(deadPlayers); //TODO: Falls Magd dabei ist, noch nicht die Rollen verraten, sondern erst wenn die Magd ablehnt, dann die Rollen verraten
+    ShowResultNight(deadPlayers); //TODO: Falls Magd noch lebt, noch nicht die Rollen verraten, sondern erst wenn die Magd ablehnt, dann die Rollen verraten
 
+    //TODO: Ist ein Jäger gestorben, dann darf der Jäger noch einen Spieler erschießen, bevor er stirbt
 
     if (IsGameOver()) {
         // Spiel ist vorbei
         GameOver();
         return;
     }
+
+
+    //TODO: Ist Bürgermeister gestorben, dann Amt weitergeben
+
 
 
     //TODO: Falls Bürgermeister vorkommt
@@ -378,9 +465,15 @@ function MakeResultNight() {
 
 
     const getChoices = (role) => {
-        const choices = choicesInTheNight[role] || [];
-        return (Array.isArray(choices) ? choices : Object.values(choices))
-            .flat(Infinity)
+        const raw = choicesInTheNight[role];
+        if (!raw) return [];
+
+        const entries = Array.isArray(raw) ? raw : Object.values(raw);
+
+        const pairs = entries.some(Array.isArray) ? entries : [entries];
+
+        return pairs
+            .map(pair => Array.isArray(pair) ? pair[0] : pair)
             .filter(choice => choice !== undefined && choice !== null);
     };
 
@@ -413,13 +506,26 @@ function MakeResultNight() {
     }
 
     // Hat Hexe den Gifttrank eingesetzt, dann stirbt das Opfer der Hexe außer es wurde beschützt von Leibwächter, dann stirbt das Opfer der Hexe nicht
-    if (choicesInTheNight["Hexe"]) {
-        Object.values(choicesInTheNight["Hexe"]).forEach((witchChoicePoison) => {
-            if (!bodyguardChoices.has(witchChoicePoison)) {
-                deadPlayers.push(witchChoicePoison);
+    if (choicesInTheNight["HexePoison"]) {
+        const poisonChoices = choicesInTheNight["HexePoison"];
+
+        if (Array.isArray(poisonChoices[0])) {
+            poisonChoices.forEach((choice) => {
+                const playerId = choice[0];
+
+                if (playerId !== undefined && !bodyguardChoices.has(playerId)) {
+                    deadPlayers.push(playerId);
+                }
+            });
+        } else {
+            const playerId = poisonChoices[0];
+
+            if (playerId !== undefined && !bodyguardChoices.has(playerId)) {
+                deadPlayers.push(playerId);
             }
-        });
+        }
     }
+
 
 
     // Ist Wolfsjunge durch die Nacht gestorben, erhöhe Werwölfe Opfer für nächste Nacht um 1
