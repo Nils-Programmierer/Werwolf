@@ -464,19 +464,70 @@ async function MakeDay() {
     const deadPlayers = MakeResultNight();
     console.log("Tote Spieler:", deadPlayers);
     console.log("Anzahl der Opfer der Werwölfe für die nächste Nacht:", werewolfVictimCount);
-    ShowResultNight(deadPlayers); //TODO: Falls Magd noch lebt, noch nicht die Rollen verraten, sondern erst wenn die Magd ablehnt, dann die Rollen verraten
+    //ShowResultNight(deadPlayers); //TODO: Falls Magd noch lebt, noch nicht die Rollen verraten, sondern erst wenn die Magd ablehnt, dann die Rollen verraten
     // TODO: Zeige Ergebnis Bäcker, Achtung keine Person darf doppelt vorkommen
 
-    //TODO: Ist ein Jäger gestorben, dann darf der Jäger noch einen Spieler erschießen, bevor er stirbt
 
+    // Nächste Nacht vorbereiten
+    choicesInTheNight = {
+        ["Amor"]: [],
+        ["Seher"]: [],
+        ["HexeHeal"]: [],
+        ["HexePoison"]: [],
+        ["Leibwächter"]: [],
+        ["Bäcker"]: [],
+        ["Dorfmatratze"]: []
+    };
+
+    // Ist ein Jäger gestorben, dann darf der Jäger noch einen Spieler erschießen, bevor er stirbt -> Spieler aktualisieren, die noch leben
+    const shotPlayers = [];
+
+    // Für jeden Jäger, der gestorben ist
+    for (let i = 0; i < deadPlayers.length; i++) {
+        const hunterPlayerNumber = deadPlayers[i];
+        const hunter = playerRoles.find(player => player.playerNumber === hunterPlayerNumber);
+
+        if (hunter?.role !== "Jäger") continue;
+        const alivePlayers = playerRoles.map(player => player.playerNumber).filter(playerNumber => !deadPlayers.includes(playerNumber));
+
+        // Niemand mehr übrig, den der Jäger erschießen kann
+        if (alivePlayers.length === 0) {
+            GameOver();
+            return;
+        }
+
+        task.textContent = "Der Jäger, Spieler " + hunterPlayerNumber + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.";
+        await speech("Der Jäger, Spieler " + hunterPlayerNumber + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.");
+
+        const [hunterVictim] = await showSelection("Der Jäger, Spieler " + hunterPlayerNumber + " ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.", 1, alivePlayers.filter(playerNumber => !shotPlayers.includes(playerNumber)));
+        shotPlayers.push(hunterVictim);
+        deadPlayers.push(hunterVictim);
+
+        //TODO: await ShowResultHunter(hunterPlayerNumber, hunterVictim); //--> Falls Magd noch lebt, kann sie die Rolle übernehmen, sonst Rolle verraten
+
+        // Falls das Opfer des Jägers ein Liebespaar ist, dann stirbt auch der Partner des Liebespaares
+        for (const [a, b] of lovers) {
+            const partner = a === hunterVictim ? b : b === hunterVictim ? a : null;
+
+            if (partner !== null && !deadPlayers.includes(partner)) {
+                deadPlayers.push(partner);
+                console.log(`Spieler ${partner} ist das Liebespaar von Spieler ${hunterVictim} und stirbt ebenfalls.`);
+                //TODO: await ShowResultLove(hunterVictim, partner); //--> Falls Magd noch lebt, kann sie die Rolle übernehmen, sonst Rolle verraten
+            }
+        }
+    }
+
+    playerRoles = playerRoles.filter(player => !deadPlayers.includes(player.playerNumber));
+    console.log("Spieler nach dem Jäger:", playerRoles);
+
+    /*
     if (IsGameOver()) {
         // Spiel ist vorbei
         GameOver();
         return;
     }
 
-
-    //TODO: Ist Bürgermeister gestorben, dann Amt weitergeben
+    //TODO: Falls Bürgermeister Rolle mitspielt und dieser gestorben ist, dann Amt weitergeben
 
 
 
@@ -486,7 +537,9 @@ async function MakeDay() {
     } else {
         // Abstimmung
         StartVoting();
-    }
+    }*/
+
+    StartNight();
 }
 
 
