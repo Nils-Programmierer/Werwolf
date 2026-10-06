@@ -465,7 +465,12 @@ async function MakeDay() {
     console.log("Tote Spieler:", deadPlayers);
     console.log("Anzahl der Opfer der Werwölfe für die nächste Nacht:", werewolfVictimCount);
     //ShowResultNight(deadPlayers); //TODO: Falls Magd noch lebt, noch nicht die Rollen verraten, sondern erst wenn die Magd ablehnt, dann die Rollen verraten
-    // TODO: Zeige Ergebnis Bäcker, Achtung keine Person darf doppelt vorkommen
+
+
+    // Zeige Ergebnis Bäcker
+    const bakerVictims = choicesInTheNight["Bäcker"].map(pair => pair[0]);
+    const uniqueBakerVictims = [...new Set(bakerVictims)];
+    await ShowResultBaker(uniqueBakerVictims);
 
 
     // Nächste Nacht vorbereiten
@@ -640,6 +645,24 @@ function MakeResultNight() {
     return deadPlayers;
 }
 
+
+
+
+
+async function ShowResultBaker(bakerVictims) {
+    task.textContent = `${bakerVictims.length > 1 ? `Die Opfer der Bäcker werden nun verraten.` : `Das Opfer des Bäckers wird nun verraten.`}`;
+    await speech(`${bakerVictims.length > 1 ? `Die Opfer der Bäcker werden nun verraten.` : `Das Opfer des Bäckers wird nun verraten.`}`);
+
+    for (const victim of bakerVictims) {
+        const victimPlayer = playerRoles.find(player => player.playerNumber === victim);
+
+        if (victimPlayer) {
+            task.textContent = `${victimPlayer.player.charAt(0).toUpperCase() + victimPlayer.player.slice(1)} wurde vom Bäcker in dieser Nacht das Maul gestopft.`;
+            await speech(`${victimPlayer.player.charAt(0).toUpperCase() + victimPlayer.player.slice(1)} wurde vom Bäcker in dieser Nacht das Maul gestopft.`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+    }
+}
 
 
 
