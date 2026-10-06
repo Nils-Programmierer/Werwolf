@@ -18,15 +18,15 @@ Werwolf ist ein spannendes Partyspiel voller Täuschung, Diskussionen und überr
 
 ## Einblicke
 
-<a href=""><img src="" alt="" height="300" /></a>
-<a href=""><img src="" alt="" height="300" /></a>
-<a href=""><img src="" alt="Hauptseite" height="300" /></a>
-<a href=""><img src="" alt="Mobile Ansicht" height="300" /></a>
+<a href="img/docu/main-site.png"><img src="img/docu/main-site.png" alt="Hauptseite" height="300" /></a>
+<a href="img/docu/my-role.png"><img src="img/docu/my-role.png" alt="Rollen verteilen" height="300" /></a>
+<a href="img/docu/victim.png"><img src="img/docu/victim.png" alt="Opfer aussuchen" height="300" /></a>
+<a href="img/docu/mobile-view.png"><img src="img/docu/mobile-view.png" alt="Mobile Ansicht" height="300" /></a>
 <a href=""><img src="" alt="Demo Video" height="300" /></a>
 
 ## Projektstatus
 
-**Letztes Update:** September 2026
+**Letztes Update:** Oktober 2026
 
 ## Technologien
 
