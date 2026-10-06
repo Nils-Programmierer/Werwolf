@@ -14,6 +14,9 @@ let potionWitch = [];
 let werewolfVictimCount = 1;
 let step = 0;
 let round = 0;
+let wastVoting = false;
+let withMajor = false;
+let mayorPlayerNumber = null;
 
 const task = document.getElementById("task");
 
@@ -64,6 +67,7 @@ function hideLoadingScreen() {
 
 async function LoadData() {
     const playerRolesJSON = localStorage.getItem("playerRoles");
+    const rolesJSON = localStorage.getItem("roles");
 
     if (playerRolesJSON) {
         playerRoles = JSON.parse(playerRolesJSON);
@@ -75,7 +79,16 @@ async function LoadData() {
         return;
     }
 
+    if (rolesJSON) {
+        const roles = JSON.parse(rolesJSON);
+
+        if (roles.some(([role, count]) => role === "Bürgermeister" && count > 0)) {
+            withMajor = true;
+        }
+    }
+
     console.log("Loaded playerRoles:", playerRoles);
+    console.log("Bürgermeister included:", withMajor);
 }
 
 
@@ -184,7 +197,7 @@ async function WakeUpAtNight() {
 
             task.textContent = "Der Amor, Spieler " + amorPlayerNumber + ", wacht auf.";
             await speech("Als erstes wacht der Amor, Spieler " + amorPlayerNumber + ", auf. Bitte wähle zwei Spieler, die ein Liebespaar werden sollen.");
-            const [numberOfLovers, numberOfLovers2] = await showSelection("Wer soll das Liebespaar werden?", 2, playerRoles.filter(player => player.playerNumber !== amorPlayerNumber).map(player => player.playerNumber));
+            const [numberOfLovers, numberOfLovers2] = await showSelection("Wer soll das Liebespaar werden?", 2, playerRoles.filter(player => player.playerNumber !== amorPlayerNumber).map(player => player.playerNumber), false);
             lovers.push([numberOfLovers, numberOfLovers2]);
             choicesInTheNight["Amor"].push([amorPlayerNumber, numberOfLovers, numberOfLovers2]);
 
@@ -219,7 +232,7 @@ async function WakeUpAtNight() {
         await speech(`Die Werwölfe wachen auf. Bitte wählt gemeinsam ${werewolfVictimCount == 1 ? "ein" : werewolfVictimCount} Opfer, ${werewolfVictimCount == 1 ? "das" : "die"} in dieser Nacht sterben ${werewolfVictimCount == 1 ? "soll" : "sollen"}.`);
 
         const possibleVictims = playerRoles.filter(player => player.role !== "Werwolf" && player.role !== "Wolfsjunge" && player.role !== "Weißer Wolf").map(player => player.playerNumber);
-        const victim = await showSelection(`Die Werwölfe dürfen ${werewolfVictimCount == 1 ? "ein" : werewolfVictimCount} Opfer wählen.`, werewolfVictimCount, possibleVictims);
+        const victim = await showSelection(`Die Werwölfe dürfen ${werewolfVictimCount == 1 ? "ein" : werewolfVictimCount} Opfer wählen.`, werewolfVictimCount, possibleVictims, false);
         choicesInTheNight["Werwolf"] = victim;
 
         task.textContent = "Bitte schließt nun die Augen und schlaft wieder ein.";
@@ -237,7 +250,7 @@ async function WakeUpAtNight() {
             task.textContent = "Der Seher, Spieler " + seerPlayerNumber + ", wacht auf.";
             await speech("Der Seher, Spieler " + seerPlayerNumber + ", wacht auf. Bitte wähle einen Spieler, dessen Rolle du erfahren möchtest.");
 
-            const [seerChoice] = await showSelection("Wähle einen Spieler aus, dessen Rolle du erfahren möchtest.", 1, playerRoles.filter(player => player.playerNumber !== seerPlayerNumber).map(player => player.playerNumber));
+            const [seerChoice] = await showSelection("Wähle einen Spieler aus, dessen Rolle du erfahren möchtest.", 1, playerRoles.filter(player => player.playerNumber !== seerPlayerNumber).map(player => player.playerNumber), false);
             choicesInTheNight["Seher"].push([seerChoice, seerPlayerNumber]);
             let seerRole = playerRoles.find(player => player.playerNumber === seerChoice).role;
 
@@ -284,7 +297,7 @@ async function WakeUpAtNight() {
 
                 if (witchChoiceHeal === "Heiltrank") {
                     await speech("Du darfst nun entscheiden, welchen Spieler du mit deinem Heiltrank retten möchtest.");
-                    const [witchHealChoice] = await showSelection("Wähle einen Spieler, den du mit deinem Heiltrank retten möchtest.", 1, choicesInTheNight["Werwolf"]);
+                    const [witchHealChoice] = await showSelection("Wähle einen Spieler, den du mit deinem Heiltrank retten möchtest.", 1, choicesInTheNight["Werwolf"], false);
                     choicesInTheNight["HexeHeal"].push([witchHealChoice, witchPlayerNumber]);
                     potionWitch.push(["heal", witchPlayerNumber]);
 
@@ -303,7 +316,7 @@ async function WakeUpAtNight() {
 
                 if (witchChoicePoison === "Gifttrank") {
                     await speech("Du darfst nun entscheiden, welchen Spieler du mit deinem Gifttrank töten möchtest.");
-                    const [witchPoisonChoice] = await showSelection("Wähle einen Spieler, den du mit deinem Gifttrank töten möchtest.", 1, playerRoles.filter(player => player.playerNumber !== witchPlayerNumber).map(player => player.playerNumber));
+                    const [witchPoisonChoice] = await showSelection("Wähle einen Spieler, den du mit deinem Gifttrank töten möchtest.", 1, playerRoles.filter(player => player.playerNumber !== witchPlayerNumber).map(player => player.playerNumber), false);
                     choicesInTheNight["HexePoison"].push([witchPoisonChoice, witchPlayerNumber]);
                     potionWitch.push(["poison", witchPlayerNumber]);
 
@@ -328,7 +341,7 @@ async function WakeUpAtNight() {
             task.textContent = "Der Leibwächter, Spieler " + bodyguardPlayerNumber + ", wacht auf.";
             await speech("Der Leibwächter, Spieler " + bodyguardPlayerNumber + ", wacht auf. Bitte wähle einen Spieler, den du schützen möchtest.");
 
-            const [bodyguardChoice] = await showSelection("Wähle einen Spieler aus, den du schützen möchtest.", 1, playerRoles.map(player => player.playerNumber).filter(playerNumber => !(choicesLastNight?.["Leibwächter"] ?? []).some(pair => Array.isArray(pair) && pair[1] === bodyguardPlayerNumber && pair[0] === playerNumber)));
+            const [bodyguardChoice] = await showSelection("Wähle einen Spieler aus, den du schützen möchtest.", 1, playerRoles.map(player => player.playerNumber).filter(playerNumber => !(choicesLastNight?.["Leibwächter"] ?? []).some(pair => Array.isArray(pair) && pair[1] === bodyguardPlayerNumber && pair[0] === playerNumber)), false);
             choicesInTheNight["Leibwächter"].push([bodyguardChoice, bodyguardPlayerNumber]);
 
             task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
@@ -347,7 +360,7 @@ async function WakeUpAtNight() {
             task.textContent = "Der Bäcker, Spieler " + bakerPlayerNumber + ", wacht auf.";
             await speech("Der Bäcker, Spieler " + bakerPlayerNumber + ", wacht auf. Bitte wähle einen Spieler, den du in dieser Nacht das Maul stopfen möchtest.");
 
-            const [bakerChoice] = await showSelection("Wähle einen Spieler aus, den du das Maul stopfen möchtest.", 1, playerRoles.map(player => player.playerNumber).filter(playerNumber => playerNumber !== bakerPlayerNumber && !(choicesLastNight?.["Bäcker"] ?? []).some(pair => Array.isArray(pair) && pair[1] === bakerPlayerNumber && pair[0] === playerNumber)));
+            const [bakerChoice] = await showSelection("Wähle einen Spieler aus, den du das Maul stopfen möchtest.", 1, playerRoles.map(player => player.playerNumber).filter(playerNumber => playerNumber !== bakerPlayerNumber && !(choicesLastNight?.["Bäcker"] ?? []).some(pair => Array.isArray(pair) && pair[1] === bakerPlayerNumber && pair[0] === playerNumber)), false);
             choicesInTheNight["Bäcker"].push([bakerChoice, bakerPlayerNumber]);
 
             task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
@@ -366,7 +379,7 @@ async function WakeUpAtNight() {
             task.textContent = "Die Dorfmatratze, Spieler " + villageSlutPlayerNumber + ", wacht auf.";
             await speech("Die Dorfmatratze, Spieler " + villageSlutPlayerNumber + ", wacht auf. Bitte wähle einen Spieler, bei dem du in dieser Nacht schlafen möchtest.");
 
-            const [villageSlutChoice] = await showSelection("Wähle einen Spieler aus, bei dem du schlafen möchtest.", 1, playerRoles.map(player => player.playerNumber).filter(playerNumber => playerNumber !== villageSlutPlayerNumber && !(choicesLastNight?.["Dorfmatratze"] ?? []).some(pair => Array.isArray(pair) && pair[1] === villageSlutPlayerNumber && pair[0] === playerNumber)));
+            const [villageSlutChoice] = await showSelection("Wähle einen Spieler aus, bei dem du schlafen möchtest.", 1, playerRoles.map(player => player.playerNumber).filter(playerNumber => playerNumber !== villageSlutPlayerNumber && !(choicesLastNight?.["Dorfmatratze"] ?? []).some(pair => Array.isArray(pair) && pair[1] === villageSlutPlayerNumber && pair[0] === playerNumber)), false);
             choicesInTheNight["Dorfmatratze"].push([villageSlutChoice, villageSlutPlayerNumber]);
 
             task.textContent = "Bitte schließe nun die Augen und schlafe wieder ein.";
@@ -382,12 +395,13 @@ async function WakeUpAtNight() {
     } else {
         task.textContent = "Die Nacht ist vorbei. Alle Spieler wachen auf.";
         await speech("Die Nacht ist vorbei. Alle Spieler wachen auf.");
+        wastVoting = false;
         await MakeDay();
     }
 }
 
 
-function showSelection(promptText, numberOfSelections, playerNumbers) {
+function showSelection(promptText, numberOfSelections, playerNumbers, allowNoOne) {
     return new Promise((resolve) => {
         const userSelection = document.getElementById("selectionButtons");
         task.textContent = promptText;
@@ -421,6 +435,22 @@ function showSelection(promptText, numberOfSelections, playerNumbers) {
 
             userSelection.appendChild(button);
         });
+
+        if (allowNoOne) {
+            const noOneButton = document.createElement("button");
+            noOneButton.classList.add("selectionButton");
+            noOneButton.type = "button";
+            noOneButton.textContent = "Niemand";
+
+            noOneButton.addEventListener("click", async () => {
+                userSelection.innerHTML = "";
+                task.textContent = "";
+                await speech("Es wurde entschieden, dass niemand sterben soll.");
+                resolve([]);
+            });
+
+            userSelection.appendChild(noOneButton);
+        }
     });
 }
 
@@ -507,7 +537,7 @@ async function MakeDay() {
         task.textContent = "Der Jäger, Spieler " + hunterPlayerNumber + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.";
         await speech("Der Jäger, Spieler " + hunterPlayerNumber + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.");
 
-        const [hunterVictim] = await showSelection("Der Jäger, Spieler " + hunterPlayerNumber + " ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.", 1, alivePlayers.filter(playerNumber => !shotPlayers.includes(playerNumber)));
+        const [hunterVictim] = await showSelection("Der Jäger, Spieler " + hunterPlayerNumber + " ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.", 1, alivePlayers.filter(playerNumber => !shotPlayers.includes(playerNumber)), false);
         shotPlayers.push(hunterVictim);
         deadPlayers.push(hunterVictim);
 
@@ -535,17 +565,43 @@ async function MakeDay() {
         return;
     }
 
-    //TODO: Falls Bürgermeister Rolle mitspielt und dieser gestorben ist, dann Amt weitergeben
+
+    // Bürgermeisterwahl erste Runde
+    if (round === 1 && withMajor && mayorPlayerNumber === null) {
+        task.textContent = "Es ist Zeit für die Bürgermeisterwahl. Bitte wählt einen Spieler, der Bürgermeister werden soll.";
+        await speech("Es ist Zeit für die Bürgermeisterwahl. Bitte wählt einen Spieler, der Bürgermeister werden soll.");
+
+        const [mayorChoice] = await showSelection("Es ist Zeit für die Bürgermeisterwahl. Bitte wählt einen Spieler, der Bürgermeister werden soll.", 1, playerRoles.map(player => player.playerNumber), false);
+        mayorPlayerNumber = mayorChoice;
+
+        task.textContent = `${playerRoles.find(p => p.playerNumber === mayorChoice).player.charAt(0).toUpperCase() + playerRoles.find(p => p.playerNumber === mayorChoice).player.slice(1)} ist nun der Bürgermeister.`;
+        await speech(`${playerRoles.find(p => p.playerNumber === mayorChoice).player.charAt(0).toUpperCase() + playerRoles.find(p => p.playerNumber === mayorChoice).player.slice(1)} ist nun der Bürgermeister.`);
+    }
 
 
-    /*
-    //TODO: Falls Bürgermeister vorkommt
-    if (round === 1) {
-        // Bürgermeisterwahl
-    } else {
-        // Abstimmung
-        StartVoting();
-    }*/
+    // Bürgermeister ist gestorben -> Amt weitergeben
+    if (withMajor && mayorPlayerNumber !== null && !playerRoles.some(player => player.playerNumber === mayorPlayerNumber)) {
+        const alivePlayers = playerRoles.map(player => player.playerNumber);
+        task.textContent = "Der Bürgermeister ist gestorben. Der alte Bürgermeister darf nun seinen Nachfolger bestimmen.";
+        await speech("Der Bürgermeister ist gestorben. Der alte Bürgermeister darf nun seinen Nachfolger bestimmen.");
+
+        const [newMayorChoice] = await showSelection("Der Bürgermeister ist gestorben. Der alte Bürgermeister darf nun seinen Nachfolger bestimmen.", 1, alivePlayers, false);
+        mayorPlayerNumber = newMayorChoice;
+
+        task.textContent = `${playerRoles.find(p => p.playerNumber === newMayorChoice).player.charAt(0).toUpperCase() + playerRoles.find(p => p.playerNumber === newMayorChoice).player.slice(1)} ist nun der neue Bürgermeister.`;
+        await speech(`${playerRoles.find(p => p.playerNumber === newMayorChoice).player.charAt(0).toUpperCase() + playerRoles.find(p => p.playerNumber === newMayorChoice).player.slice(1)} ist nun der neue Bürgermeister.`);
+    }
+
+
+    // Abstimmung
+    if (!wastVoting) {
+        const [lynchChoice] = await StartVoting();
+        choicesInTheNight["Werwolf"] = [lynchChoice];
+        wastVoting = true;
+        MakeDay();
+        return;
+    }
+
 
     StartNight();
 }
@@ -667,6 +723,13 @@ async function ShowResultBaker(bakerVictims) {
     }
 }
 
+
+async function StartVoting() {
+    const alivePlayers = playerRoles.map(player => player.playerNumber);
+    task.textContent = "Es ist Zeit für die Abstimmung.";
+    await speech("Es ist Zeit für die Abstimmung. Bitte wählt einen Spieler, den ihr lynchen möchtet.");
+    return showSelection("Es ist Zeit für die Abstimmung. Bitte wählt einen Spieler, den ihr lynchen möchtet.", 1, alivePlayers, true);
+}
 
 
 async function IsGameOver() {
