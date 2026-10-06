@@ -470,7 +470,10 @@ async function MakeDay() {
     // Zeige Ergebnis Bäcker
     const bakerVictims = choicesInTheNight["Bäcker"].map(pair => pair[0]);
     const uniqueBakerVictims = [...new Set(bakerVictims)];
-    await ShowResultBaker(uniqueBakerVictims);
+
+    if (uniqueBakerVictims.length > 0) {
+        await ShowResultBaker(uniqueBakerVictims);
+    }
 
 
     // Nächste Nacht vorbereiten
@@ -525,9 +528,9 @@ async function MakeDay() {
     playerRoles = playerRoles.filter(player => !deadPlayers.includes(player.playerNumber));
     console.log("Spieler nach dem Jäger:", playerRoles);
 
-    /*
-    if (IsGameOver()) {
-        // Spiel ist vorbei
+
+    // Spiel ist vorbei?
+    if (await IsGameOver()) {
         GameOver();
         return;
     }
@@ -535,7 +538,7 @@ async function MakeDay() {
     //TODO: Falls Bürgermeister Rolle mitspielt und dieser gestorben ist, dann Amt weitergeben
 
 
-
+    /*
     //TODO: Falls Bürgermeister vorkommt
     if (round === 1) {
         // Bürgermeisterwahl
@@ -664,6 +667,57 @@ async function ShowResultBaker(bakerVictims) {
     }
 }
 
+
+
+async function IsGameOver() {
+    const alivePlayers = playerRoles.map(player => player.playerNumber);
+    const aliveWerewolves = playerRoles.filter(player => player.role === "Werwolf" || player.role === "Wolfsjunge" || player.role === "Weißer Wolf").map(player => player.playerNumber);
+    const aliveVillagers = alivePlayers.filter(playerNumber => !aliveWerewolves.includes(playerNumber));
+
+    // Kein Spieler mehr am Leben
+    if (alivePlayers.length === 0) {
+        task.textContent = "Alle Spieler sind tot. Das Spiel ist vorbei.";
+        await speech("Alle Spieler sind tot. Das Spiel ist vorbei.");
+        return true;
+    }
+
+    // Alle Werwölfe sind tot
+    if (aliveWerewolves.length === 0) {
+        task.textContent = "Alle Werwölfe sind tot. Die Dorfbewohner haben gewonnen!";
+        await speech("Alle Werwölfe sind tot. Die Dorfbewohner haben gewonnen!");
+        return true;
+    }
+
+    // Nur noch weißer Wolf am Leben
+    if (alivePlayers.length === 1 && aliveWerewolves.length === 1 && playerRoles.find(player => player.playerNumber === aliveWerewolves[0]).role === "Weißer Wolf") {
+        task.textContent = "Nur noch der weiße Wolf ist am Leben. Der weiße Wolf hat gewonnen!";
+        await speech("Nur noch der weiße Wolf ist am Leben. Der weiße Wolf hat gewonnen!");
+        return true;
+    }
+
+    // Keine Dorfbewohner mehr am Leben
+    if (aliveVillagers.length === 0) {
+        task.textContent = "Alle Dorfbewohner sind tot. Die Werwölfe haben gewonnen!";
+        await speech("Alle Dorfbewohner sind tot. Die Werwölfe haben gewonnen!");
+        return true;
+    }
+
+    return false;
+}
+
+
+function GameOver() {
+    const btn = document.createElement("button");
+    btn.textContent = "Spiel beenden";
+    btn.type = "button";
+    btn.className = "selectionButton";
+
+    btn.addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
+
+    document.getElementById("selectionButtons").appendChild(btn);
+}
 
 
 async function speech(text) {
