@@ -306,7 +306,6 @@ function assignRolesToPlayers(roles, players) {
     });
 
     const playerRolesJSON = JSON.stringify(playerRoles);
-    console.log("Assigned Roles:", playerRolesJSON);
 
     localStorage.setItem("players", JSON.stringify(players));
     localStorage.setItem("roles", JSON.stringify(roles));

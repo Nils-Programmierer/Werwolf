@@ -8,7 +8,7 @@ let choicesInTheNight = {
     ["Bäcker"]: [],
     ["Dorfmatratze"]: []
 };
-let choicesLastNight = {}; // z.B. ["Bäcker"]: [[4, 2]]
+let choicesLastNight = {};
 let lovers = [];
 let potionWitch = [];
 let werewolfVictimCount = 1;
@@ -86,9 +86,6 @@ async function LoadData() {
             withMajor = true;
         }
     }
-
-    console.log("Loaded playerRoles:", playerRoles);
-    console.log("Bürgermeister included:", withMajor);
 }
 
 
@@ -492,10 +489,7 @@ function showTwoSelection(promptText, numberOfSelections, options) {
 
 async function MakeDay() {
     const deadPlayers = MakeResultNight();
-    console.log("Tote Spieler:", deadPlayers);
-    console.log("Anzahl der Opfer der Werwölfe für die nächste Nacht:", werewolfVictimCount);
-    //ShowResultNight(deadPlayers); //TODO: Falls Magd noch lebt, noch nicht die Rollen verraten, sondern erst wenn die Magd ablehnt, dann die Rollen verraten
-
+    await ShowResultNight(deadPlayers);
 
     // Zeige Ergebnis Bäcker
     const bakerVictims = choicesInTheNight["Bäcker"].map(pair => pair[0]);
@@ -517,47 +511,13 @@ async function MakeDay() {
         ["Dorfmatratze"]: []
     };
 
-    // Ist ein Jäger gestorben, dann darf der Jäger noch einen Spieler erschießen, bevor er stirbt -> Spieler aktualisieren, die noch leben
-    const shotPlayers = [];
+    let shotPlayers = await CheckHunters(deadPlayers);
 
-    // Für jeden Jäger, der gestorben ist
-    for (let i = 0; i < deadPlayers.length; i++) {
-        const hunterPlayerNumber = deadPlayers[i];
-        const hunter = playerRoles.find(player => player.playerNumber === hunterPlayerNumber);
-
-        if (hunter?.role !== "Jäger") continue;
-        const alivePlayers = playerRoles.map(player => player.playerNumber).filter(playerNumber => !deadPlayers.includes(playerNumber));
-
-        // Niemand mehr übrig, den der Jäger erschießen kann
-        if (alivePlayers.length === 0) {
-            GameOver();
-            return;
-        }
-
-        task.textContent = "Der Jäger, Spieler " + hunterPlayerNumber + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.";
-        await speech("Der Jäger, Spieler " + hunterPlayerNumber + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.");
-
-        const [hunterVictim] = await showSelection("Der Jäger, Spieler " + hunterPlayerNumber + " ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.", 1, alivePlayers.filter(playerNumber => !shotPlayers.includes(playerNumber)), false);
-        shotPlayers.push(hunterVictim);
-        deadPlayers.push(hunterVictim);
-
-        //TODO: await ShowResultHunter(hunterPlayerNumber, hunterVictim); //--> Falls Magd noch lebt, kann sie die Rolle übernehmen, sonst Rolle verraten
-
-        // Falls das Opfer des Jägers ein Liebespaar ist, dann stirbt auch der Partner des Liebespaares
-        for (const [a, b] of lovers) {
-            const partner = a === hunterVictim ? b : b === hunterVictim ? a : null;
-
-            if (partner !== null && !deadPlayers.includes(partner)) {
-                deadPlayers.push(partner);
-                console.log(`Spieler ${partner} ist das Liebespaar von Spieler ${hunterVictim} und stirbt ebenfalls.`);
-                //TODO: await ShowResultLove(hunterVictim, partner); //--> Falls Magd noch lebt, kann sie die Rolle übernehmen, sonst Rolle verraten
-            }
-        }
+    // Erschossene Rolle der Spieler des Jägers anzeigen
+    while (shotPlayers.length > 0) {
+        await ShowResultNight(shotPlayers);
+        shotPlayers = await CheckHunters(shotPlayers);
     }
-
-    playerRoles = playerRoles.filter(player => !deadPlayers.includes(player.playerNumber));
-    console.log("Spieler nach dem Jäger:", playerRoles);
-
 
     // Spiel ist vorbei?
     if (await IsGameOver()) {
@@ -608,7 +568,6 @@ async function MakeDay() {
 
 
 function MakeResultNight() {
-    console.log("Ergebnisse der Nacht:", choicesInTheNight);
     let deadPlayers = [];
     werewolfVictimCount = 1;
     choicesLastNight = {};
@@ -618,8 +577,6 @@ function MakeResultNight() {
             choicesLastNight[role] = choicesInTheNight[role];
         }
     }
-
-    console.log("choicesLastNight:", choicesLastNight);
 
 
     const getChoices = (role) => {
@@ -706,6 +663,79 @@ function MakeResultNight() {
 
 
 
+async function ShowResultNight(deadPlayers) {
+    return new Promise(async (resolve) => {
+        if (deadPlayers.length === 0) {
+            task.textContent = "Es ist niemand gestorben.";
+            await speech("Es ist niemand gestorben.");
+            resolve();
+            return;
+        }
+
+
+        // Prüfe, ob mindestens eine Magd noch lebt
+        const maids = playerRoles.filter(player => player.role === "Magd");
+        const maidAlive = maids.some(maid => !deadPlayers.includes(maid.playerNumber));
+
+        // Für jede Magd Rolle
+        if (maidAlive) {
+            for (const deadPlayerNumber of deadPlayers) {
+                const deadPlayer = playerRoles.find(player => player.playerNumber === deadPlayerNumber);
+
+                if (deadPlayer) {
+                    const playerName = deadPlayer.player.charAt(0).toUpperCase() + deadPlayer.player.slice(1);
+
+                    task.textContent = `${playerName} ist gestorben.`;
+                    await speech(`${playerName} ist gestorben.`);
+
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                }
+            }
+
+
+            for (const maid of playerRoles.filter(player => player.role === "Magd" && !deadPlayers.includes(player.playerNumber))) {
+                const maidPlayerNumber = maid.playerNumber;
+
+                task.textContent = `Die Magd, Spieler ${maidPlayerNumber}, darf nun entscheiden, ob sie die Rolle einer gestorbenen Person übernehmen möchte.`;
+                await speech(`Die Magd, Spieler ${maidPlayerNumber}, darf nun entscheiden, ob sie die Rolle einer gestorbenen Person übernehmen möchte.`);
+
+                const [maidChoice] = await showTwoSelection(`Die Magd, Spieler ${maidPlayerNumber}, darf nun entscheiden, ob sie die Rolle einer gestorbenen Person übernehmen möchte.`, 1, ["Ja", "Nein"]);
+
+                if (maidChoice === "Ja") {
+                    const whichPlayer = await showSelection(`Die Magd, Spieler ${maidPlayerNumber}, hat sich entschieden, die Rolle einer gestorbenen Person zu übernehmen. Bitte wähle eine gestorbene Person aus.`, 1, deadPlayers.map(playerNumber => playerRoles.find(player => player.playerNumber === playerNumber).playerNumber), false);
+                    const chosenPlayer = playerRoles.find(player => player.playerNumber === whichPlayer[0]);
+
+                    if (chosenPlayer) {
+                        task.textContent = `Die Magd, Spieler ${maidPlayerNumber}, hat sich entschieden, die Rolle von ${chosenPlayer.player.charAt(0).toUpperCase() + chosenPlayer.player.slice(1)} zu übernehmen.`;
+                        await speech(`Die Magd, Spieler ${maidPlayerNumber}, hat sich entschieden, die Rolle von ${chosenPlayer.player.charAt(0).toUpperCase() + chosenPlayer.player.slice(1)} zu übernehmen.`);
+
+                        deadPlayers = deadPlayers.filter(playerNumber => playerNumber !== chosenPlayer.playerNumber);
+                        maid.role = chosenPlayer.role;
+                    }
+                } else {
+                    task.textContent = `Die Magd, Spieler ${maidPlayerNumber}, hat sich entschieden, keine Rolle zu übernehmen.`;
+                    await speech(`Die Magd, Spieler ${maidPlayerNumber}, hat sich entschieden, keine Rolle zu übernehmen.`);
+                }
+            }
+        }
+
+        // Keine Magd mehr am Leben oder Rollenübernahme abgelehnt, dann werden die Rollen der gestorbenen Spieler verraten
+        for (const deadPlayerNumber of deadPlayers) {
+            const deadPlayer = playerRoles.find(player => player.playerNumber === deadPlayerNumber);
+
+            if (deadPlayer) {
+                const playerName = deadPlayer.player.charAt(0).toUpperCase() + deadPlayer.player.slice(1);
+                const role = deadPlayer.role;
+
+                task.textContent = `${playerName} ist gestorben. Die Rolle von ${playerName} war ${role}.`;
+                await speech(`${playerName} ist gestorben. Die Rolle von ${playerName} war ${role}.`);
+
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+        }
+        resolve();
+    });
+}
 
 
 async function ShowResultBaker(bakerVictims) {
@@ -721,6 +751,62 @@ async function ShowResultBaker(bakerVictims) {
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
     }
+}
+
+
+async function CheckHunters(deadPlayers) {
+    // Ist ein Jäger gestorben, dann darf der Jäger noch einen Spieler erschießen, bevor er stirbt -> Spieler aktualisieren, die noch leben
+    let shotPlayers = [];
+
+    // Für jeden Jäger, der gestorben ist
+    for (let i = 0; i < deadPlayers.length; i++) {
+        const hunterPlayerNumber = deadPlayers[i];
+        const hunter = playerRoles.find(player => player.playerNumber === hunterPlayerNumber);
+
+        if (hunter?.role !== "Jäger") continue;
+        const alivePlayers = playerRoles.map(player => player.playerNumber).filter(playerNumber => !deadPlayers.includes(playerNumber));
+        const hunterName = hunter.player.charAt(0).toUpperCase() + hunter.player.slice(1);
+
+
+        // Niemand mehr übrig, den der Jäger erschießen kann
+        if (alivePlayers.length === 0) {
+            task.textContent = "Der Jäger, " + hunterName + ", ist gestorben, aber es gibt keine Spieler mehr, die er erschießen kann. Das Spiel ist vorbei.";
+            await speech("Der Jäger, " + hunterName + ", ist gestorben, aber es gibt keine Spieler mehr, die er erschießen kann. Das Spiel ist vorbei.");
+            GameOver();
+            return;
+        }
+
+        task.textContent = "Der Jäger, " + hunterName + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.";
+        await speech("Der Jäger, " + hunterName + ", ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.");
+
+        const [hunterVictim] = await showSelection("Der Jäger, " + hunterName + " ist gestorben. Bitte wähle einen Spieler, den du noch erschießen möchtest.", 1, alivePlayers.filter(playerNumber => !shotPlayers.includes(playerNumber)), false);
+
+        const killWithConnections = (start) => {
+            const queue = [start];
+            const visited = new Set();
+
+            while (queue.length > 0) {
+                const current = queue.shift();
+                if (deadPlayers.includes(current)) continue;
+
+                if (visited.has(current) || deadPlayers.includes(current) || shotPlayers.includes(current)) continue;
+                visited.add(current);
+
+                shotPlayers.push(current);
+
+                lovers.forEach(([a, b]) => {
+                    if (a === current) queue.push(b);
+                    else if (b === current) queue.push(a);
+                });
+            }
+        };
+
+        // Falls das Opfer des Jägers ein Liebespaar ist, dann stirbt auch der Partner des Liebespaares
+        killWithConnections(hunterVictim);
+    }
+
+    playerRoles = playerRoles.filter(player => !deadPlayers.includes(player.playerNumber));
+    return shotPlayers;
 }
 
 
@@ -785,8 +871,6 @@ function GameOver() {
 
 async function speech(text) {
     try {
-        console.log("Spreche:", text);
-
         const result = await textToSpeech.call(
             text,
             "de",
