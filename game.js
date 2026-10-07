@@ -26,6 +26,9 @@ let voiceStyle = null;
 const MODEL_BASE_URL = "https://huggingface.co/Supertone/supertonic-3/resolve/main/onnx";
 import { loadTextToSpeech, loadVoiceStyle, writeWavFile } from "./helper.js";
 
+let germanVoice = null;
+let phoneMode = false;
+
 
 function updateLoading(title, text, progress = null) {
     const loadingTitle = document.getElementById("loadingTitle");
@@ -93,66 +96,85 @@ async function LoadData() {
 async function initSpeech() {
     if (textToSpeech) return;
 
-    console.log("Lade Supertonic...");
-
-    updateLoading(
-        "Sprachengine wird geladen...",
-        "Lade Supertonic...",
-        20
-    );
-
-    const result = await loadTextToSpeech(
-        MODEL_BASE_URL,
-        {
-            executionProviders: ["webgpu", "wasm"],
-            graphOptimizationLevel: "all"
-        },
-        (model, current, total) => {
-            console.log(
-                `Lade Modell ${current}/${total}: ${model}`
-            );
-
-            const modelProgress =
-                total > 0
-                    ? current / total
-                    : 0;
-
-            const progress =
-                20 + modelProgress * 65;
-
-            updateLoading(
-                "Sprachengine wird geladen...",
-                `${model} (${current}/${total})`,
-                progress
-            );
+    if (phoneMode) {
+        function pickVoice() {
+            const voices = speechSynthesis.getVoices();
+            germanVoice =
+                voices.find(v => v.lang === "de-DE" && /natural|neural|online/i.test(v.name)) ||
+                voices.find(v => v.lang === "de-DE") ||
+                voices.find(v => v.lang.startsWith("de")) ||
+                null;
         }
-    );
 
-    textToSpeech = result.textToSpeech;
+        speechSynthesis.onvoiceschanged = pickVoice;
+        pickVoice();
+    } else {
+        console.log("Lade Supertonic...");
 
-    updateLoading(
-        "Stimme wird geladen...",
-        "Lade Sprachstil...",
-        90
-    );
+        updateLoading(
+            "Sprachengine wird geladen...",
+            "Lade Supertonic...",
+            20
+        );
 
-    voiceStyle = await loadVoiceStyle([
-        "https://huggingface.co/Supertone/supertonic-3/resolve/main/voice_styles/M1.json"
-    ]);
+        const result = await loadTextToSpeech(
+            MODEL_BASE_URL,
+            {
+                executionProviders: ["webgpu", "wasm"],
+                graphOptimizationLevel: "all"
+            },
+            (model, current, total) => {
+                console.log(
+                    `Lade Modell ${current}/${total}: ${model}`
+                );
 
-    updateLoading(
-        "Fast geschafft...",
-        "Sprachengine ist bereit.",
-        97
-    );
+                const modelProgress =
+                    total > 0
+                        ? current / total
+                        : 0;
 
-    console.log("Supertonic bereit!");
+                const progress =
+                    20 + modelProgress * 65;
+
+                updateLoading(
+                    "Sprachengine wird geladen...",
+                    `${model} (${current}/${total})`,
+                    progress
+                );
+            }
+        );
+
+        textToSpeech = result.textToSpeech;
+
+        updateLoading(
+            "Stimme wird geladen...",
+            "Lade Sprachstil...",
+            90
+        );
+
+        voiceStyle = await loadVoiceStyle([
+            "https://huggingface.co/Supertone/supertonic-3/resolve/main/voice_styles/M1.json"
+        ]);
+
+        updateLoading(
+            "Fast geschafft...",
+            "Sprachengine ist bereit.",
+            97
+        );
+
+        console.log("Supertonic bereit!");
+    }
 }
 
 
 async function initGame() {
     try {
         await LoadData();
+
+        if (window.navigator.userAgent.includes("Mobile")) {
+            phoneMode = true;
+        }
+
         await initSpeech();
 
         console.log("Spiel und TTS vollständig geladen.");
@@ -870,45 +892,58 @@ function GameOver() {
 
 
 async function speech(text) {
-    try {
-        const result = await textToSpeech.call(
-            text,
-            "de",
-            voiceStyle,
-            8,
-            1.0,
-            0.2
-        );
-
-        const wavLength = Math.floor(
-            textToSpeech.sampleRate * result.duration[0]
-        );
-
-        const wav = result.wav.slice(0, wavLength);
-
-        const wavBuffer = writeWavFile(
-            wav,
-            textToSpeech.sampleRate
-        );
-
-        const blob = new Blob(
-            [wavBuffer],
-            { type: "audio/wav" }
-        );
-
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-
-        await new Promise((resolve, reject) => {
-            audio.addEventListener("ended", resolve, { once: true });
-            audio.addEventListener("error", reject, { once: true });
-
-            audio.play().catch(reject);
+    if (phoneMode) {
+        return new Promise(resolve => {
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = "de-DE";
+            if (germanVoice) u.voice = germanVoice;
+            u.rate = 0.95;
+            u.pitch = 1.0;
+            u.onend = resolve;
+            u.onerror = resolve;
+            speechSynthesis.speak(u);
         });
+    } else {
+        try {
+            const result = await textToSpeech.call(
+                text,
+                "de",
+                voiceStyle,
+                8,
+                1.0,
+                0.2
+            );
 
-        URL.revokeObjectURL(url);
+            const wavLength = Math.floor(
+                textToSpeech.sampleRate * result.duration[0]
+            );
 
-    } catch (error) {
-        console.error("TTS FEHLER:", error);
+            const wav = result.wav.slice(0, wavLength);
+
+            const wavBuffer = writeWavFile(
+                wav,
+                textToSpeech.sampleRate
+            );
+
+            const blob = new Blob(
+                [wavBuffer],
+                { type: "audio/wav" }
+            );
+
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+
+            await new Promise((resolve, reject) => {
+                audio.addEventListener("ended", resolve, { once: true });
+                audio.addEventListener("error", reject, { once: true });
+
+                audio.play().catch(reject);
+            });
+
+            URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error("TTS FEHLER:", error);
+        }
     }
 }

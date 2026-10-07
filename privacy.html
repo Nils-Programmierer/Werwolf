@@ -29,7 +29,7 @@
     <main>
         <article class="legal">
             <h2>Datenschutzerklärung</h2>
-            <p class="legal-meta">Stand: September 2026</p>
+            <p class="legal-meta">Stand: Oktober 2026</p>
 
             <section>
                 <h3>1. Datenschutz auf einen Blick</h3>
@@ -40,7 +40,8 @@
                 <ul>
                     <li>Es gibt <strong>keine Anmeldung und keine Registrierung</strong>.</li>
                     <li>Es gibt <strong>keine Analyse-, Tracking- oder Werbedienste</strong>. Für die Sprachausgabe
-                        werden jedoch Modellressourcen von externen Anbietern geladen (siehe Abschnitt 4).</li>
+                        werden auf dem Desktop Modellressourcen von externen Anbietern geladen, auf Mobilgeräten wird
+                        die Sprachausgabe des Geräts genutzt (siehe Abschnitt 4).</li>
                     <li>Einstellungen und Spielstände werden ausschließlich <strong>lokal in deinem Browser</strong>
                         (localStorage) gespeichert und nicht an uns übertragen.</li>
                 </ul>
@@ -64,25 +65,55 @@
             </section>
 
             <section>
-                <h3>4. Lokale Sprachausgabe und externe Dienste</h3>
+                <h3>4. Sprachausgabe und externe Dienste</h3>
                 <p>
-                    Die Sprachsynthese (Text-to-Speech) verwendet das Supertonic-3-Modell und wird
-                    lokal im Browser ausgeführt. Die ONNX-Modelle und Konfigurationsdateien werden
-                    von Hugging Face (huggingface.co) geladen; das Stimmprofil M1.json wird ebenfalls
-                    von dort abgerufen. Das JavaScript-Modul ONNX Runtime Web wird von unpkg.com
-                    geladen. Beim ersten Spielstart kann dadurch ein größerer Download anfallen.
-                    ONNX-Modellantworten werden in der Cache API des Browsers gespeichert, damit sie
-                    bei späteren Aufrufen wiederverwendet werden können. Das Stimmprofil wird
-                    vom Anwendungscode nicht in diesem Cache gespeichert.
+                    Die Sprachausgabe (Text-to-Speech) funktioniert je nach Gerät auf zwei Wegen:
+                    auf dem Desktop über das Modell Supertonic-3, auf Mobilgeräten (Android und iOS)
+                    über die in Browser und Betriebssystem eingebaute Sprachausgabe.
+                </p>
+
+                <h4>Desktop: Supertonic-3</h4>
+                <p>
+                    Die Sprachsynthese verwendet das Supertonic-3-Modell und wird lokal im Browser
+                    ausgeführt. Die ONNX-Modelle und Konfigurationsdateien werden von Hugging Face
+                    (huggingface.co) geladen; das Stimmprofil M1.json wird ebenfalls von dort abgerufen.
+                    Das JavaScript-Modul ONNX Runtime Web wird von unpkg.com geladen. Beim ersten
+                    Spielstart kann dadurch ein größerer Download anfallen. ONNX-Modellantworten werden
+                    in der Cache API des Browsers gespeichert, damit sie bei späteren Aufrufen
+                    wiederverwendet werden können. Das Stimmprofil wird vom Anwendungscode nicht in
+                    diesem Cache gespeichert.
                 </p>
                 <p>
-                    Der vorzulesende Text wird nicht an Hugging Face, unpkg oder einen externen
+                    Der vorzulesende Text wird dabei nicht an Hugging Face, unpkg oder einen externen
                     Sprachsynthese-Dienst gesendet. Die Sprachausgabe wird im Browser erzeugt und
                     abgespielt. Beim Abruf der Ressourcen übermitteln Browser technisch notwendige
                     Verbindungsdaten, insbesondere die IP-Adresse und angeforderte URL, an die
                     jeweiligen Anbieter. Für deren Verarbeitung gelten zusätzlich deren
                     Datenschutzinformationen und Bedingungen.
                 </p>
+
+                <h4>Mobilgeräte: eingebaute Sprachausgabe</h4>
+                <p>
+                    Auf Mobilgeräten nutzt Werwolf die Web Speech API (speechSynthesis) deines Browsers.
+                    Dabei werden keine Modelle von Hugging Face oder unpkg geladen. Welche Stimmen zur
+                    Verfügung stehen, bestimmt dein Gerät bzw. dein Browser. Wir wählen nach Möglichkeit
+                    eine deutsche Stimme aus.
+                </p>
+                <p>
+                    Je nach Gerät und gewählter Stimme kann die Sprachsynthese lokal auf dem Gerät oder
+                    über einen Online-Dienst des Geräte- bzw. Browserherstellers (z. B. Google oder
+                    Apple) erfolgen. Bei Online-Stimmen kann der vorzulesende Text dafür an den
+                    jeweiligen Anbieter übertragen werden. Darauf haben wir keinen Einfluss; es gelten
+                    die Datenschutzinformationen des jeweiligen Herstellers. Wenn du das vermeiden
+                    möchtest, kannst du in den Systemeinstellungen deines Geräts eine lokal
+                    installierte Stimme als Standard festlegen oder die Anwendung auf dem Desktop nutzen.
+                </p>
+                <p>
+                    Die vorgelesenen Texte enthalten Spielabläufe und die von dir eingegebenen
+                    Spielernamen.
+                </p>
+
+                <h4>Allgemein</h4>
                 <p>
                     Es werden keine Analyse- oder Tracking-Tools, Social-Media-Plugins oder
                     Werbenetzwerke eingebunden. Externe Links, etwa zu GitHub, werden erst geöffnet,
