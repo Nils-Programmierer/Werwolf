@@ -22,7 +22,7 @@ Werwolf ist ein spannendes Partyspiel voller Täuschung, Diskussionen und überr
 <a href="img/docu/my-role.png"><img src="img/docu/my-role.png" alt="Rollen verteilen" height="300" /></a>
 <a href="img/docu/victim.png"><img src="img/docu/victim.png" alt="Opfer aussuchen" height="300" /></a>
 <a href="img/docu/mobile-view.png"><img src="img/docu/mobile-view.png" alt="Mobile Ansicht" height="300" /></a>
-<a href=""><img src="" alt="Demo Video" height="300" /></a>
+<a href="img/docu/demo.gif"><img src="img/docu/demo.gif" alt="Demo Video" height="300" /></a>
 
 ## Projektstatus
 
